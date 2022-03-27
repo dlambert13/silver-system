@@ -1,2 +1,7 @@
 # silver-system
-M1 BIM project - supervisor: Denis Sheynikhovich, SU - students: Nam Nguyen, David Lambert
+# Analysis of receptive fields in deep neural networks
+M1 BIM project - 2021/2022  
+Supervisor: Denis Sheynikhovich, SU  
+Students: Nam Nguyen, David Lambert
+
+based on http://arxiv.org/abs/1412.6856
