@@ -6,6 +6,4 @@ Students: Nam Nguyen, David Lambert
 
 based on http://arxiv.org/abs/1412.6856
 
-todo before use:
-- download test dataset (val256_color.zip) from 
-- place it in a "datasets" folder
+the scripts will look for images in folders within a "datasets" folder
