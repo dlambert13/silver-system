@@ -13,5 +13,5 @@ https://papers.nips.cc/paper/2012/file/c399862d3b9d6b76c8436e924a68c45b-Paper.pd
 https://arxiv.org/abs/1404.5997
 
 **Please note:** 
-the scripts will look for images in folders within a "datasets" folder
+the scripts will look for images in folders within a "datasets" folder  
 dataset used so far: https://drive.google.com/drive/folders/1qo1_eAw-8LqRzbaFvCSxCD6ynAc8Fl1D?usp=sharing
