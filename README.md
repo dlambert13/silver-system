@@ -1,9 +1,10 @@
-# silver-system
 # Analysis of receptive fields in deep neural networks
-Second Semester Research Project - 2021/2022
+MS in Computer Science (Bioinformatics and Modeling - BIM)
+Second Semester research project
+Sorbonne Université, 2021/2022
 
 Supervisor: Denis Sheynikhovich, Associate Professor - Institut de la vision, Sorbonne Université / INSERM / CNRS  
-Contributors: Khanh Nam Nguyen, David Lambert - MS in Computer Science (Bioinformatics and Modeling - BIM)
+Contributors: Khanh Nam Nguyen, David Lambert
 
 Deep learning explicability methods based on Zhou et al., 2015 http://arxiv.org/abs/1412.6856
 Applied to images from Becu et al., 2020 https://pubmed.ncbi.nlm.nih.gov/31548677/
