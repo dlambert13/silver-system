@@ -1,5 +1,5 @@
 # Analysis of receptive fields in deep neural networks
-MS in Computer Science (Bioinformatics and Modeling - BIM)  
+M.Sc. in Computer Science (Bioinformatics and Modeling track - BIM)  
 Second Semester research project - Sorbonne Université, 2021/2022
 
 Supervisor: Denis Sheynikhovich, Associate Professor - Silver Sight Team, Institut de la vision, Sorbonne Université / INSERM / CNRS  
