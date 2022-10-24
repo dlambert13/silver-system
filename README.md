@@ -49,6 +49,8 @@ They should be subfolders of the "./datasets" folder. Each of the two networks u
 
 A validation subset of the Avatar dataset is used to compute AvatarNet's confusion matrix and accuracy to crosscheck against the figures provided by the team that trained the network and make sure preprocessing worked as planned.
 
+Below are details about each dataset or set of images:
+
 ### COCO dataset (123k images)
 Entire unlabeled COCO (Common Objects in COntext) dataset
 path: "./datasets/coco-unlabeled2017"
