@@ -1,4 +1,4 @@
-# silver system, version 2022.1024 - Analysis of receptive fields in deep neural networks
+# ``silver system`` version 2022.1024 - Analysis of receptive fields in deep neural networks
 M.Sc. in Computer Science (Bioinformatics and Modeling track - BIM)  
 Second Semester research project - Sorbonne Université, 2021/2022
 
