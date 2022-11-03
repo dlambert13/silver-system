@@ -1,6 +1,6 @@
 # ``silver-system``, version 2022.1103 - analysis of receptive fields in deep neural networks
 M.Sc. in Computer Science (Bioinformatics and Modeling track - BIM)  
-Second Semester research project - Sorbonne Université, 2021/2022
+Second semester research project - Sorbonne Université, 2021/2022
 
 Supervisor: Denis Sheynikhovich, Associate Professor - Silver Sight Team, Institut de la vision, Sorbonne Université / INSERM / CNRS  
 Authors: Kh&#x00E1;nh Nam NGUY&#x1EC4;N and David Lambert
