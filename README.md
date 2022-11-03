@@ -48,9 +48,9 @@ The following instructions assume you have created a directory for the project, 
 - once the environment has been activated, install the Python dependencies described in the attached ``requirements.txt`` file (for example by calling ``pip install -r requirements.txt``)
 
 You can then run the scripts:
-- ``python activation_logging.py DATASET [NETWORK]`` will go through the files in ``DATASET`` (see ``Datasets`` section below) and log the top 10 activating files for all units of all ReLU layers of ``NETWORK``. The ``NETWORK`` argument is optional: the script will use AlexNet by default, but ``avn`` will specify the use of AvatarNet:
-``python activation_logging.py coco-unlabeled2017``
-``python activation_logging.py avatar_dataset avn``
+- ``python activation_logging.py DATASET [NETWORK]`` will go through the files in ``DATASET`` (see ``Datasets`` section below) and log the top 10 activating files for all units of all ReLU layers of ``NETWORK``. The ``NETWORK`` argument is optional: the script will use AlexNet by default, but ``avn`` will specify the use of AvatarNet:  
+``python activation_logging.py coco-unlabeled2017``  
+``python activation_logging.py avatar_dataset avn``  
 - ``python main_script.py`` will execute the rest of the pipeline using either the ``axn`` or the ``avn`` log from the ``logs`` directory, targeting the layers and units specified in its body.
 
 The execution of ``activation_logging.py`` being, at the time of the present release, quite slow, logs for ``axn`` and ``avn`` have already been included in the present repository, under the ``logs`` directory.
