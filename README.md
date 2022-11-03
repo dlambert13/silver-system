@@ -21,7 +21,7 @@ Following the "tracer bullet" principle outlined in _The Pragmatic Programmer_, 
 
 The code included is the authors' honest attempt at implementing these methods from scratch, without referring to previously implemented versions of Zhou's or similar methods, and without any prior knowledge of the PyTorch platform.
 
-As a consequence, it is the authors' opinion that, while functional and successful, several aspects of the implementation disqualify it from being production-ready, in particular when it comes to its execution speed. Tentative solutions to the issues identified by the authors have been included in the accompanying documentation (see ``post_mortem.md``, to be released later).
+As a consequence, it is the authors' opinion that, while functional and successful, several aspects of the implementation disqualify it from being production-ready, in particular when it comes to its execution speed. Tentative solutions to the issues identified by the authors have been included in the accompanying documentation (see ``TODO.md``, to be released later).
 
 The implementation is described in the ``Pipeline`` section below.
 
