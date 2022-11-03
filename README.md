@@ -69,7 +69,7 @@ Below are details about each dataset or set of images:
 
 ### COCO dataset (123k images)
 Entire unlabeled COCO (Common Objects in COntext) dataset
-Download link: http://images.cocodataset.org/zips/unlabeled2017.zip
+[Download link](http://images.cocodataset.org/zips/unlabeled2017.zip)
 Structure: none (flat folder containing the images, no subfolder)
 
 ### AlexNet script tests dataset
