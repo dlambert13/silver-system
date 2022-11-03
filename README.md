@@ -63,13 +63,13 @@ Directory structure for the datasets is detailed below.
 ## Datasets
 They should be subfolders of the ``./datasets`` folder (paths such as ``./datasets/{DATASET}``). Each of the two networks uses two datasets : a very small one to test and iterate without wasting time while implementing the elementary components and functionalities, and a large one on which the actual results (see accompanying slides and report) are obtained.
 
-A validation subset of the Avatar dataset is used to compute AvatarNet's confusion matrix and accuracy to crosscheck against the figures provided by the team that trained the network and make sure preprocessing worked as planned.
+A validation subset of the Avatar dataset is used to compute AvatarNet's confusion matrix and accuracy to crosscheck against the figures provided by the team that trained the network and make sure preprocessing worked as planned. Please note that neither AvatarNet nor the Avatar dataset have, to date, been released to the public by the Avatar team.
 
 Below are details about each dataset or set of images:
 
 ### COCO dataset (123k images)
-Entire unlabeled COCO (Common Objects in COntext) dataset
-[Download link](http://images.cocodataset.org/zips/unlabeled2017.zip)
+Entire unlabeled COCO (Common Objects in COntext) dataset  
+[Download link](http://images.cocodataset.org/zips/unlabeled2017.zip)  
 Structure: none (flat folder containing the images, no subfolder)
 
 ### AlexNet script tests dataset
