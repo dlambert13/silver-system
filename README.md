@@ -1,9 +1,9 @@
-# ``silver system``, version 2022.1024 - analysis of receptive fields in deep neural networks
+# ``silver system``, version 2022.1103 - analysis of receptive fields in deep neural networks
 M.Sc. in Computer Science (Bioinformatics and Modeling track - BIM)  
 Second Semester research project - Sorbonne Université, 2021/2022
 
 Supervisor: Denis Sheynikhovich, Associate Professor - Silver Sight Team, Institut de la vision, Sorbonne Université / INSERM / CNRS  
-Authors: Khanh Nam Nguyen and David Lambert
+Authors: Kh&#x00E1;nh Nam NGUY&#x1EC4;N and David Lambert
 
 - _Ab initio_ implementation of an ![explainable artificial intelligence](https://en.wikipedia.org/wiki/Explainable_artificial_intelligence) (XAI) method based on discrepancy maps and receptive field computation in convolutional neural networks from ![Zhou et al., 2015](http://arxiv.org/abs/1412.6856)
 
@@ -21,7 +21,7 @@ Following the "tracer bullet" principle outlined in _The Pragmatic Programmer_, 
 
 The code included is the authors' honest attempt at implementing these methods from scratch, without referring to previously implemented versions of Zhou's or similar methods, and without any prior knowledge of the PyTorch platform.
 
-As a consequence, it is the authors' opinion that, while functional and successful, several aspects of the implementation disqualify it from being production-ready, in particular when it comes to its execution speed. Tentative solutions to the problems identified by the authors have been included in the accompanying documentation.
+As a consequence, it is the authors' opinion that, while functional and successful, several aspects of the implementation disqualify it from being production-ready, in particular when it comes to its execution speed. Tentative solutions to the issues identified by the authors have been included in the accompanying documentation (see ``post_mortem.md``, to be released later).
 
 The implementation is described in the ``Pipeline`` section below.
 
@@ -37,9 +37,9 @@ The authors would like to stress the fact that the research project, the code re
 - ``top10.py`` assembles the top-10 images into one to make the results more readable;
 - ``rec_field.py`` computes the receptive field from the discrepancy maps.
 
-``helpers.py`` contains the helper functions used in the other scripts to make code more modular.
+``helpers.py`` contains the helper functions used in the other scripts to make code more modular. In particular, ``top_10`` parses a given log file and returns the top 10 images for a specific unit of a specific layer; ``stack`` stacks a list of images together, either in a row or in a column; ``occlusion`` creates the occluded images from a specific image; ``network_forward_pass`` passes a given image through a given model.
 
-## Setup and execution (using Ubuntu inside Windows WSL; tests on other OS types pending)
+## Setup and execution (using Ubuntu inside Windows WSL; tests in other environments pending)
 The following instructions assume you have created a directory for the project, and are running a CLI inside said directory.
 
 - create a virtual environment to isolate the project's execution and avoid version conflicts, using Python 3.8 or above, for example using ``venv`` (see [documentation](https://docs.python.org/fr/3/library/venv.html)). The following command creates an environment called ``env_silver-system``:
@@ -48,10 +48,16 @@ The following instructions assume you have created a directory for the project, 
 - once the environment has been activated, install the Python dependencies described in the attached ``requirements.txt`` file (for example by calling ``pip install -r requirements.txt``)
 
 You can then run the scripts:
-- ``python activation_logging.py DATASET [NETWORK]`` will go through the files in ``DATASET`` (see ``Datasets`` section below) and log the top 10 activating files for all units of all ReLU layers of ``NETWORK``. The ``NETWORK`` argument is optional: the script will use AlexNet by default, but ``avn`` will specify the use of AvatarNet.
-- ``python main_script.py`` will execute the rest of the pipeline.
+- ``python activation_logging.py DATASET [NETWORK]`` will go through the files in ``DATASET`` (see ``Datasets`` section below) and log the top 10 activating files for all units of all ReLU layers of ``NETWORK``. The ``NETWORK`` argument is optional: the script will use AlexNet by default, but ``avn`` will specify the use of AvatarNet:
+``python activation_logging.py coco-unlabeled2017``
+``python activation_logging.py avatar_dataset avn``
+- ``python main_script.py`` will execute the rest of the pipeline using either the ``axn`` or the ``avn`` log from the ``logs`` directory, targeting the layers and units specified in its body.
 
-Please note that, the execution of ``activation_logging.py`` being quite slow, logs for ``axn`` and ``avn`` have already been included in the present repository, under the ``logs`` directory.
+The execution of ``activation_logging.py`` being, at the time of the present release, quite slow, logs for ``axn`` and ``avn`` have already been included in the present repository, under the ``logs`` directory.
+
+AvatarNet should be in an ``avatar`` directory at the same arborescence level as ``src`` and ``logs``: specifically, the file that the scripts expect to find there is named ``alexnet_places_old.pt``.
+
+Directory structure for the datasets is detailed below.
 
 
 ## Datasets
