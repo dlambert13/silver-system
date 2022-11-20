@@ -5,7 +5,7 @@ Second semester research project - Sorbonne Université, 2021/2022
 Supervisor: Denis Sheynikhovich, Associate Professor - Silver Sight Team, Institut de la vision, Sorbonne Université / INSERM / CNRS  
 Authors: Kh&#x00E1;nh Nam NGUY&#x1EC4;N and David Lambert
 
-- _Ab initio_ implementation of an ![explainable artificial intelligence](https://en.wikipedia.org/wiki/Explainable_artificial_intelligence) (XAI) method based on discrepancy maps and receptive field computation in convolutional neural networks from ![Zhou et al., 2015](http://arxiv.org/abs/1412.6856)
+- _Ab initio_ implementation of an ![explainable artificial intelligence](https://en.wikipedia.org/wiki/Explainable_artificial_intelligence) (XAI) method based on discrepancy maps and receptive field computation in convolutional neural networks from ![Zhou et al, 2015](http://arxiv.org/abs/1412.6856)
 
 - application to AlexNet and a variant trained by the Silver Sight team on images from a behavioral neuroscience experiment on human orientation in an artificial environment
 
@@ -17,7 +17,7 @@ Each network uses a specific dataset, with specific image sizes, on which a spec
 
 
 ## Contents
-Following the "tracer bullet" principle outlined in _The Pragmatic Programmer_, this code repository contains a proof-of-concept implementation of the methods outlined in _Zhou et al., 2015_.
+Following the "tracer bullet" principle outlined in _The Pragmatic Programmer_, this code repository contains a proof-of-concept implementation of the methods outlined in _Zhou et al, 2015_.
 
 The code included is the authors' honest attempt at implementing these methods from scratch, without referring to previously implemented versions of Zhou's or similar methods, and without any prior knowledge of the PyTorch platform.
 
