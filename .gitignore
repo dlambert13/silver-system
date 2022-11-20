@@ -1,0 +1,9 @@
+# Directory structure
+datasets/
+results/
+
+# Virtual environment
+env_silver-system/
+
+# Byte-compiled files
+src/__pycache__/

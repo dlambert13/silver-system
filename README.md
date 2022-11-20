@@ -29,7 +29,7 @@ The authors would like to stress the fact that the research project, the code re
 
 
 ## Pipeline
-``activation_logging.py`` logs the top 10 images for all units of all ReLU layers of the chosen network
+``activation_logging.py`` logs the top 10 images for all units of all ReLU layers of the chosen network.
 
 ``main_script.py`` wraps the rest of the pipeline: it is where the parameters (which model to use, which units of which layers to target, which stride to use in the occlusion process) for the receptive field computation are defined, and then passed to the scripts listed below:
 - ``occlusion.py`` creates the occluded images from the top-10 images, with which the discrepancy map will be computed;
@@ -43,16 +43,16 @@ The authors would like to stress the fact that the research project, the code re
 The following instructions have been tested using Ubuntu inside Windows WSL; tests in other environments are pending.
 
 - create a directory for the project, and open a terminal with the project directory as the current working directory.
-- create a virtual environment to isolate the project's execution and avoid version conflicts, using Python 3.8 or above, for example using ``venv`` (see [documentation](https://docs.python.org/fr/3/library/venv.html)). The following command creates an environment called ``env_silver-system``:
+- create a virtual environment to isolate the project's execution and avoid version conflicts, using Python 3.8 or above, for example using ``venv`` (see [documentation](https://docs.python.org/fr/3/library/venv.html)). The following command creates an environment called ``env_silver-system``:  
 ```python3.8 -m venv env_silver-system```
 - activate the environment: ```source env_silver-system/bin/activate```
 - once the environment has been activated, install the Python dependencies described in the attached ``requirements.txt`` file (for example by calling ``pip install -r requirements.txt``)
 
 You can then run the scripts in the ``./src`` subdirectory:
-- ``python activation_logging.py DATASET [NETWORK]`` will go through the files in ``DATASET`` (see ``Datasets`` section below) and log the top 10 activating files for all units of all ReLU layers of ``NETWORK``. The ``NETWORK`` argument is optional: the script will use AlexNet by default, but ``avn`` will specify the use of AvatarNet:  
-``python activation_logging.py coco-unlabeled2017``  
-``python activation_logging.py avatar_dataset avn``  
-- ``python main_script.py`` will execute the rest of the pipeline using either the ``axn`` or the ``avn`` log from the ``logs`` directory, targeting the layers and units specified in its body.
+- ``python ./src/activation_logging.py DATASET [NETWORK]`` will go through the files in ``DATASET`` (see ``Datasets`` section below) and log the top 10 activating files for all units of all ReLU layers of ``NETWORK``. The ``NETWORK`` argument is optional: the script will use AlexNet by default, but ``avn`` will specify the use of AvatarNet:  
+``python ./src/activation_logging.py coco-unlabeled2017``  
+``python ./src/activation_logging.py avatar_dataset avn``  
+- ``python ./src/main_script.py`` wraps the rest of the receptive field computation pipeline, and will execute it using either the ``axn`` or the ``avn`` log from the ``logs`` directory, targeting the layers and units specified in its body.
 
 The execution of ``activation_logging.py`` being, at the time of the present release, quite slow, logs for ``axn`` and ``avn`` have already been included in the present repository, under the ``logs`` directory.
 
@@ -91,3 +91,6 @@ Structure: two subfolders "geo" and "lmk"
 Contents of the validation subset included in "DataAfterWellSamplingCleanedTrainTestVal.zip", used for the confusion matrix and accuracy computations
 1k images: 500 for each class
 Structure: two subfolders "geo" and "lmk"
+
+## License
+GNU GPLv3

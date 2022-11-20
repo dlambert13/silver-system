@@ -1,4 +1,5 @@
-"""computing the top-10 discrepancy maps for a given unit on a given dataset
+"""Computing the top-10 discrepancy maps for a given unit on a given dataset,
+using the occluded images resulting from occlusion.py
 """
 
 import os
@@ -7,9 +8,7 @@ import torch
 from torchvision import transforms
 from PIL import Image
 import datetime
-import helpers
-
-network_forward_pass = helpers.network_forward_pass
+from helpers import network_forward_pass, top_10
 
 # toggle GPU usage
 # placeholder for future GPU usage implementation
@@ -34,20 +33,18 @@ MODEL_ID = log_filename.split('_')[0]
 # STRIDE and OCCLUDER have a direct impact on the number of files to process;
 # higher values can be used to speed up the process, but the readability of
 # the discrepancy maps will drop accordingly
-# FACTOR is the multiplier for the value of the difference in activation
-# between the baseline image and the occluded image; influences readability
-# of the discrepancy map but no effect on computation time
 STRIDE = int(sys.argv[4])
 OCCLUDER = STRIDE
+# FACTOR is the multiplier for the value of the difference in activation
+# between the baseline image and the occluded image; higher values make
+# discrepancy maps more legible; no effect on computation time
 FACTOR = 15
 
 ##############################################################################
 # directory structure creation/verification
 ##############################################################################
-
-# base project directory
-base_dir = ".."
-# occluded images directory (output of process.py)
+base_dir = os.path.join(os.getcwd(), "results") # base results directory
+# occluded images directory (output of occlusion.py)
 occluded_base_dir = os.path.join(base_dir, "tmp")
 # discrepancy maps directory
 dm_dir = os.path.join(base_dir, "discrepancy")
@@ -62,17 +59,15 @@ print("Results for this unit will be saved in:", unit_dm_dir)
 
 if "discrepancy" not in os.listdir(base_dir):
     os.mkdir(dm_dir)
-
 if MODEL_ID not in os.listdir(dm_dir):
     os.mkdir(model_dm_dir)
-
 if target_unit_id not in os.listdir(model_dm_dir):
     os.mkdir(unit_dm_dir)
 
 ##############################################################################
 # retrieving top-10 file names from log and loading the network
 ##############################################################################
-image_list = helpers.top_10(LAYER, UNIT, LOG)
+image_list = top_10(LAYER, UNIT, LOG)
 nb_images = len(image_list)
 
 if MODEL_ID == "avn":
@@ -93,7 +88,7 @@ else:
         pretrained=True
     )
     # pointing to the resized images
-    resized_dir = os.path.join("..", "tmp", "resized_axn")
+    resized_dir = os.path.join(occluded_base_dir, "resized_axn")
     buffer_image_list = []
     for top10_filepath in image_list:
         _, top10_filename = os.path.split(top10_filepath)
@@ -102,7 +97,9 @@ else:
     image_list = buffer_image_list
 
 ##############################################################################
-# looping over the 10 file names
+# looping over the 10 file names:
+# step 1: baseline forward pass, 2: occluded images forward pass,
+# and 3: discrepancy analysis to compute the discrepancy map
 ##############################################################################
 for image_filepath in image_list:
     _, image_filename = os.path.split(image_filepath)
@@ -202,15 +199,21 @@ Computing discrepancy map for image \'{}\' using unit {} of layer {}
     x_size, y_size = Image.open(image_filepath).size
     output_image = Image.new("RGB", (x_size, y_size))
 
+    # storing the baseline activation in a variable
     baseline = activation_log[image_filepath]
+    # removing baseline filepath from activation log
     activation_log.pop(image_filepath)
 
+    # each log entry is the filepath to an occluded image
+    # occluded filepath format is "..._x-y.png", x and y are the coordinates
+    # we retrieve the coordinates of the occluder from the filepath
     for log_entry in activation_log:
         activation = activation_log[log_entry]
         difference = baseline - activation
+        log_entry = log_entry.split("_")[-1]
         log_entry = log_entry.split("-")
-        x_step = int(log_entry[0].split("_")[-1])
-        y_step = int(log_entry[1].split(".")[0])
+        x_step = int(log_entry[0])
+        y_step = int(log_entry[1].rstrip(".png"))
         value = int(FACTOR * torch.max(difference))
         greyscale_shade = (value, value, value)
         x_pos = x_step * STRIDE
