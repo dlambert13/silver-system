@@ -17,7 +17,7 @@ Each network uses a specific dataset, with specific image sizes, on which a spec
 
 
 ## Contents
-Following the "tracer bullet" principle outlined in [The Pragmatic Programmer](https://pragprog.com/titles/tpp20/the-pragmatic-programmer-20th-anniversary-edition/), this code repository contains a proof-of-concept implementation of the methods outlined in _Zhou et al, 2015_.
+Following the "tracer bullet" principle outlined in [The Pragmatic Programmer](https://pragprog.com/titles/tpp20/the-pragmatic-programmer-20th-anniversary-edition/) (Thomas & Hunt, 1999), this code repository contains a proof-of-concept implementation of the methods outlined in _Zhou et al, 2015_.
 
 The code included is the authors' honest attempt at implementing these methods from scratch, without referring to previously implemented versions of Zhou's or similar methods, and without any prior knowledge of the PyTorch platform.
 
@@ -39,9 +39,10 @@ The authors would like to stress the fact that the research project, the code re
 
 ``helpers.py`` contains the helper functions used in the other scripts to make code more modular. In particular, ``top_10`` parses a given log file and returns the top 10 images for a specific unit of a specific layer; ``stack`` stacks a list of images together, either in a row or in a column; ``occlusion`` creates the occluded images from a specific image; ``network_forward_pass`` passes a given image through a given model.
 
-## Setup and execution (using Ubuntu inside Windows WSL; tests in other environments pending)
-The following instructions assume you have created a directory for the project, and are running a CLI inside said directory.
+## Setup and execution
+The following instructions have been tested using Ubuntu inside Windows WSL; tests in other environments are pending.
 
+- create a directory for the project, and open a terminal with the project directory as the current working directory.
 - create a virtual environment to isolate the project's execution and avoid version conflicts, using Python 3.8 or above, for example using ``venv`` (see [documentation](https://docs.python.org/fr/3/library/venv.html)). The following command creates an environment called ``env_silver-system``:
 ```python3.8 -m venv env_silver-system```
 - activate the environment: ```source env_silver-system/bin/activate```
