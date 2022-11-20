@@ -9,7 +9,7 @@ The purpose of this document is not to bring definitive answers but to try and d
 
 The term _post-mortem_ merely reflects the fact that this document was drafted after the research project's defense, which took place at the end of May 2022.
 
-**Please note** that this document, in its present draft state, is incomplete and has not yet been reviewed by, and does not in any way reflect the views of or otherwise bind the authors' supervisor for this research project, Associate Professor Denis Sheynikhovich (Institute of Vision, INSERM/CNRS/Sorbonne Université), to whom the authors would like to reiterate their sincere gratitude for his attention and support over the course of their collaboration.
+**Please note** that this document, in its present draft state, is incomplete and has not yet been reviewed by, and does not in any way reflect the views of or otherwise bind the authors' supervisor for this research project, Associate Professor Denis Sheynikhovich, to whom the authors would like to reiterate their sincere gratitude for his attention and support over the course of their collaboration.
 
 ## Implementation details
 
