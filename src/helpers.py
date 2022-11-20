@@ -1,9 +1,8 @@
 import torch
-from PIL import Image, ImageOps
+from PIL import Image
 import cv2 as cv
 from torchvision import transforms
 import numpy as np
-import matplotlib.pyplot as plt
 import datetime
 import os
 
@@ -26,66 +25,6 @@ def predict(path, model, preprocess):
     return label, confidence
 
 
-def binary_image(array, filename):
-    """takes as input a 2D array
-    converts to an image with white pixels where array > 0,
-    black pixels everywhere else
-    """
-    array = np.asarray(array)
-    filtered_array = np.where(array > 0, 255, 0)
-    output_image = Image.fromarray(filtered_array.astype(dtype="uint8"))
-    title = filename.rstrip(".jpg") + "_binary.jpg"
-    output_image.save(title, "jpeg")
-
-
-def bar_chart(x_values, y_values, max_x, max_y, filename):
-    fig, ax = plt.subplots()
-    ax.bar(x_values, y_values, width=1, edgecolor="white", linewidth=0.7)
-    
-    ax.set(
-        xlim=(0, max_x), xticks=np.arange(0, max_x, max_x / 10),
-        ylim=(0, max_y), yticks=np.arange(0, max_y, max_y / 10)
-    )
-
-    fig.savefig(filename, transparent=False, dpi=80, bbox_inches="tight")
-
-
-def nonzero_unique(array):
-    """returns non-zero unique values of an array and their counts
-    for plotting purposes"""
-    array = np.asarray(array)
-    unique, counts = np.unique(array, return_counts=True)
-
-    # filtering zeros to display only
-    unique = [unique[i] for i in range(1, len(unique))]
-    counts = [counts[i] for i in range(1, len(counts))]
-
-    return unique, counts
-
-
-def center_mass(array):
-    """2D array
-    """
-    total = np.sum(array)
-
-    x_coord = (array.sum(axis=1) @ range(array.shape[0])) / total
-    y_coord = (array.sum(axis=0) @ range(array.shape[1])) / total
-
-    return x_coord, y_coord
-
-
-def normalize(array):
-    """2D array
-    """
-    array_max = np.max(array)
-    array_min = np.min(array)
-    normalized_array = array - array_min
-    normalized_array = np.where(normalized_array < 0, 0, normalized_array)
-    normalized_array = normalized_array * (255 / array_max - array_min)
-
-    return normalized_array.astype(dtype="uint8")
-
-
 def tensor_from_file(filename):
     """preps the image stored in the image file and preprocesses it before
     classification by the model
@@ -105,9 +44,7 @@ def tensor_from_file(filename):
             std=[0.229, 0.224, 0.225]
         )
     ])
-
     tensor = preprocess(image)
-
     image.close()
 
     return tensor
@@ -243,6 +180,7 @@ def mask_overlay(background, mask, savepath):
 
 
 def add(file_list, target_filename):    
+    array_sum = 0
     for file in file_list:
         image = Image.open(file)
         np_array = np.asarray(image)
@@ -262,24 +200,7 @@ def add(file_list, target_filename):
     result.save(target_filename, "png")
 
 
-def mean(file_list, target_filename):
-    length = len(file_list)
-    tensor_sum = np.zeros((224, 224, 3), dtype="uint8")
-    
-    for file in file_list:
-        image = Image.open(file)
-        tensor = np.asarray(image)
-        tensor_sum += tensor
-
-    tensor_mean = np.array(tensor_sum / length, dtype="uint8")
-
-    result = Image.fromarray(tensor_mean)
-    result.save(target_filename, "jpeg")
-
-
 def calibrate(filepath, target_filepath):
-    #try threshold:     
-    #try opencv:
     source = Image.open(filepath)
     x_size = source.size[0]
     y_size = source.size[1]
@@ -290,10 +211,6 @@ def calibrate(filepath, target_filepath):
     path = filepath.rstrip(tail)
     
     tensor = np.asarray(source)
-    #THRESHOLD = 10
-    #tensor = np.where(tensor > THRESHOLD, tensor, 0)
-
-    #center = np.unravel_index(np.argmax(tensor, axis=None), tensor.shape)
     # np.nonzero returns three arrays of indices :
     # row (y), column (x), depth (band), in this order
     try:
@@ -341,9 +258,12 @@ def resize(filepath, save_filepath, new_size=(224, 224)):
     output_image.save(save_filepath, "jpeg")
 
 
-def occlusion(filepath, stride=3, occluder=11):
+def occlusion(filepath, occluded_dir, stride=3, occluder=11):
+    """occluded_dir: to specify the directory where the occluded images must
+    be saved
+    """
     name = filepath.split("/")[-1].rstrip(".jpg").rstrip(".png")
-    occluded_list = os.listdir("../tmp")
+    occluded_list = os.listdir(occluded_dir)
 
     if name in occluded_list:
         print("Occluded images already exist. Skipping...")
@@ -352,7 +272,7 @@ def occlusion(filepath, stride=3, occluder=11):
         # timestamp: exec clock starts
         start = datetime.datetime.now()
 
-        output_dir = f"../tmp/{name}"
+        output_dir = os.path.join(occluded_dir, name)
         os.mkdir(output_dir)    
 
         OCCLUDER_SIZE = occluder
@@ -427,32 +347,24 @@ def occlusion(filepath, stride=3, occluder=11):
 
 
 def top_10(layer, unit, log):
+    """warning: heavily relies on the structure of the log file"""
     log_file = open(log, 'r')
     file_as_list = [line for line in log_file]
     
-    # target unit log retrieval
+    # target unit log retrieval: using the "L, U:" line as a checkpoint
     checkpoint = file_as_list.index(f"{layer}, {unit}:\n")
     target_line = file_as_list[checkpoint + 1]
 
+    # building filepath list from log line:
+    # ['relpath/to/images/image0.jpg', .., 'relpath/to/images/image9.jpg']
     buffer_list = target_line.rstrip("']\n").lstrip("['").split("', '")
     image_list = []
 
     for filename in buffer_list:
-        if filename.find("\\") != -1:
-            filename = filename.replace("\\\\", "/")
+        filename = filename.replace("..", os.getcwd())
         image_list.append(filename)
 
     return image_list
-
-
-def dataset_path_from_log(log):
-    """assumes the file is formatted in a certain way
-    """
-    with open(log, 'r') as log_file:
-        file_as_list = [line for line in log_file]
-        target = file_as_list[1].split("\t")[0]
-        path = target.lstrip("dataset: ") 
-        return path
 
 
 def max_extractor(filepath, target_filepath):

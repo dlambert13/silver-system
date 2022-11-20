@@ -1,6 +1,6 @@
 import sys
 import os
-import helpers
+from helpers import max_extractor, calibrate, add
 
 LAYER = sys.argv[1]
 UNIT = sys.argv[2]
@@ -17,16 +17,14 @@ MODEL_ID = log_filename.split('_')[0]
 ##############################################################################
 # directory structure creation/verification
 ##############################################################################
-base_dir = ".."
-
+base_dir = os.path.join(os.getcwd(), "results") # base results directory
 dc_dir = os.path.join(
-    "..",
+    base_dir,
     "discrepancy",
     MODEL_ID,
     target_unit_id
 )
-
-rf_dir = os.path.join("..", "rf")
+rf_dir = os.path.join(base_dir, "rf")
 model_rf_dir = os.path.join(rf_dir, MODEL_ID)
 unit_rf_dir = os.path.join(model_rf_dir, target_unit_id)
 
@@ -40,7 +38,10 @@ if target_unit_id not in os.listdir(model_rf_dir):
     os.mkdir(unit_rf_dir)
 
 ##############################################################################
-
+# receptive field computation from the top 10 discrepancy maps
+##############################################################################
+# creating lists where filenames are stored
+# to automate the cleanup process (see the bottom of the script)
 base_list = []
 max_filepaths = []
 cal_filepaths = []
@@ -48,28 +49,32 @@ cal_filepaths = []
 for filename in os.listdir(dc_dir):
     dc_filepath = os.path.join(dc_dir, filename) # points to current dc map
     base_filename = filename.split(".")[0] # removing file extension
-    base_list.append(base_filename) # to automate the rest of the process
+    base_list.append(base_filename) # storing base filename for later lookup
     
-    # -- contour containing max activation in each dc map is saved to an aux file
+    # contour containing max activation in each dc map is saved to an aux file
     max_filepath = os.path.join(
         unit_rf_dir,
         f"{base_filename}_max.png"
     )
-    max_filepaths.append(max_filepath) # to automate the rest of the process
-    helpers.max_extractor(dc_filepath, max_filepath)
+    max_filepaths.append(max_filepath) # to automate cleanup
+    max_extractor(dc_filepath, max_filepath) # see helpers.max_extractor
     
-    # -- calibrating (centering) each contour and saving to a second aux file
+    # calibrating (centering) each contour and saving to a second aux file
     cal_filepath = os.path.join(
         unit_rf_dir,
         f"{base_filename}_cal.png"
     )
     cal_filepaths.append(cal_filepath) # to automate the rest of the process
-    helpers.calibrate(max_filepath, cal_filepath)
+    calibrate(max_filepath, cal_filepath) # see helpers.calibrate
 
 rf_filepath = os.path.join(unit_rf_dir, f"{target_unit_id}_rf.png")
-helpers.add(cal_filepaths, rf_filepath)
+ # overlaying the ten calibrated images together; see helpers.add
+add(cal_filepaths, rf_filepath)
 
+##############################################################################
 # cleaning up auxiliary files
+##############################################################################
+# comment out to keep the auxiliary files
 #"""
 for i in range(len(base_list)):
     os.remove(max_filepaths[i])

@@ -11,10 +11,10 @@ import sys
 import os
 import datetime
 import torch
-import helpers
+from helpers import network_forward_pass
 
 ##############################################################################
-# constants and script parameters (command line arguments)
+# constants and script parameters (from command line arguments)
 ##############################################################################
 # DATASET (sys.argv[1]) indicates the dataset folder, as a subfolder of
 # the ".\datasets" folder
@@ -157,9 +157,9 @@ checkpoints = [(i * int(dataset_len / 10)) for i in range(1, 11)]
 for file_index in range(dataset_len):
     filename = file_list[file_index]
     if MODEL_ID == "avn":
-        helpers.network_forward_pass(model, filename, mode="avatar", gpu=GPU)
+        network_forward_pass(model, filename, mode="avatar", gpu=GPU)
     else:
-        helpers.network_forward_pass(model, filename, gpu=GPU)
+        network_forward_pass(model, filename, gpu=GPU)
     
     # progress indicator (for long file lists)
     if file_index in checkpoints:
