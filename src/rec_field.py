@@ -1,7 +1,15 @@
+"""Computes the unit's receptive field from the discrepancy maps obtained
+from the top 10 images
+"""
+
+##############################################################################
 import sys
 import os
 from helpers import max_extractor, calibrate, add
 
+##############################################################################
+# constants and parameters (CLI args or otherwise)
+##############################################################################
 LAYER = sys.argv[1]
 UNIT = sys.argv[2]
 LOG = sys.argv[3]
@@ -15,27 +23,31 @@ _, log_filename = os.path.split(LOG)
 MODEL_ID = log_filename.split('_')[0]
 
 ##############################################################################
-# directory structure creation/verification
+# directory structure creation/verification and save path
 ##############################################################################
 base_dir = os.path.join(os.getcwd(), "results") # base results directory
+model_dir = os.path.join(base_dir, MODEL_ID) # model-specific directory
 dc_dir = os.path.join(
     base_dir,
-    "discrepancy",
     MODEL_ID,
+    "discrepancy",
     target_unit_id
 )
-rf_dir = os.path.join(base_dir, "rf")
-model_rf_dir = os.path.join(rf_dir, MODEL_ID)
-unit_rf_dir = os.path.join(model_rf_dir, target_unit_id)
+rf_dir = os.path.join(model_dir, "rf")
+rf_filepath = os.path.join(rf_dir, f"{target_unit_id}_rf.png")
 
-if "rf" not in os.listdir(base_dir):
+if MODEL_ID not in os.listdir(base_dir):
+    os.mkdir(model_dir)
+
+if "rf" not in os.listdir(model_dir):
     os.mkdir(rf_dir)
 
-if MODEL_ID not in os.listdir(rf_dir):
-    os.mkdir(model_rf_dir)
-
-if target_unit_id not in os.listdir(model_rf_dir):
-    os.mkdir(unit_rf_dir)
+init_message = (
+    "\n------> Computing receptive field from top 10 discrepancy maps\n"
+    f"Model-specific directory: {model_dir}\n"
+    f"Results for this unit will be saved in: {rf_dir}"
+)
+print(init_message)
 
 ##############################################################################
 # receptive field computation from the top 10 discrepancy maps
@@ -53,7 +65,7 @@ for filename in os.listdir(dc_dir):
     
     # contour containing max activation in each dc map is saved to an aux file
     max_filepath = os.path.join(
-        unit_rf_dir,
+        rf_dir,
         f"{base_filename}_max.png"
     )
     max_filepaths.append(max_filepath) # to automate cleanup
@@ -61,14 +73,12 @@ for filename in os.listdir(dc_dir):
     
     # calibrating (centering) each contour and saving to a second aux file
     cal_filepath = os.path.join(
-        unit_rf_dir,
+        rf_dir,
         f"{base_filename}_cal.png"
     )
     cal_filepaths.append(cal_filepath) # to automate the rest of the process
     calibrate(max_filepath, cal_filepath) # see helpers.calibrate
-
-rf_filepath = os.path.join(unit_rf_dir, f"{target_unit_id}_rf.png")
- # overlaying the ten calibrated images together; see helpers.add
+# overlaying the ten calibrated images together; see helpers.add
 add(cal_filepaths, rf_filepath)
 
 ##############################################################################

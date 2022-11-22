@@ -2,16 +2,18 @@
 using the occluded images resulting from occlusion.py
 """
 
+##############################################################################
 import os
 import sys
 import torch
-from torchvision import transforms
 from PIL import Image
 import datetime
 from helpers import network_forward_pass, top_10
 
-# toggle GPU usage
-# placeholder for future GPU usage implementation
+##############################################################################
+# constants and parameters (CLI args or otherwise)
+##############################################################################
+# toggles GPU usage; placeholder for future GPU usage implementation
 GPU = False
 
 # constants: script parameters
@@ -46,23 +48,26 @@ FACTOR = 15
 base_dir = os.path.join(os.getcwd(), "results") # base results directory
 # occluded images directory (output of occlusion.py)
 occluded_base_dir = os.path.join(base_dir, "tmp")
-# discrepancy maps directory
-dm_dir = os.path.join(base_dir, "discrepancy")
-# directory where the model-specific discrepancy maps will be saved
-model_dm_dir = os.path.join(dm_dir, MODEL_ID)
-# directory for the unit-specific discrepancy maps will be saved
-unit_dm_dir = os.path.join(model_dm_dir, target_unit_id)
+# directory where the model-specific results will be saved
+model_dir = os.path.join(base_dir, MODEL_ID)
+# discrepancy maps directory within the model-specific directory
+dm_dir = os.path.join(model_dir, "discrepancy")
+# directory where the unit-specific discrepancy maps will be saved
+unit_dm_dir = os.path.join(dm_dir, target_unit_id)
 
-print("Computing discrepancy maps")
-print("Model-specific directory:", model_dm_dir)
-print("Results for this unit will be saved in:", unit_dm_dir)
-
-if "discrepancy" not in os.listdir(base_dir):
+if MODEL_ID not in os.listdir(base_dir):
+    os.mkdir(model_dir)
+if "discrepancy" not in os.listdir(model_dir):
     os.mkdir(dm_dir)
-if MODEL_ID not in os.listdir(dm_dir):
-    os.mkdir(model_dm_dir)
-if target_unit_id not in os.listdir(model_dm_dir):
+if target_unit_id not in os.listdir(dm_dir):
     os.mkdir(unit_dm_dir)
+
+init_message = (
+    "\n------> Computing discrepancy maps\n"
+    f"Model-specific directory: {model_dir}\n"
+    f"Results for this unit will be saved in: {unit_dm_dir}"
+)
+print(init_message)
 
 ##############################################################################
 # retrieving top-10 file names from log and loading the network
@@ -97,7 +102,7 @@ else:
     image_list = buffer_image_list
 
 ##############################################################################
-# looping over the 10 file names:
+# looping over the 10 files:
 # step 1: baseline forward pass, 2: occluded images forward pass,
 # and 3: discrepancy analysis to compute the discrepancy map
 ##############################################################################
@@ -114,9 +119,11 @@ for image_filepath in image_list:
     start = datetime.datetime.now()
 
     current_index = image_list.index(image_filepath) + 1
-    start_template = """---- Processing image {} out of {}
-Computing discrepancy map for image \'{}\' using unit {} of layer {}
--- Loading model"""
+    start_template = (
+        "\n---- Processing image {} out of {}\n"
+        "Computing discrepancy map for image \'{}\' using unit {} of layer {}\n"
+        "-- Loading model\n"
+    )
 
     start_message = start_template.format(
         current_index,
@@ -129,10 +136,6 @@ Computing discrepancy map for image \'{}\' using unit {} of layer {}
 
     def activation_map(module, input, output,
         target_unit=UNIT):
-        """
-        note: the reference to output[0] assumes the batch submitted to the
-        model only contains one image at a time 
-        """
         activation_map = output[0][target_unit]
         activation_log.update({current_filepath: activation_map})
 

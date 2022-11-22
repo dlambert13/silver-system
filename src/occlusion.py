@@ -2,10 +2,14 @@
 on the information retrieved from the pre-computed log file
 """
 
+##############################################################################
 import sys
 import os
 from helpers import top_10, resize, occlusion
 
+##############################################################################
+# constants and parameters (CLI args or otherwise)
+##############################################################################
 LAYER = sys.argv[1]
 UNIT = sys.argv[2]
 LOG = sys.argv[3]
