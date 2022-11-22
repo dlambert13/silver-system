@@ -14,8 +14,8 @@ from helpers import top_10
 # as a reference regarding the AlexNet architecture, the indices of the
 # model's ReLU layers, and the associated number of units:
 # l_u_dict = {1: 64, 4: 192, 7: 384, 9: 256, 11: 256}
-LAYERS = [1, 4] # layers to target, as a Python list
-UNITS = [i for i in range(10)] # units to target, as a Python list
+LAYERS = [7] # layers to target, as a Python list
+UNITS = [1] # units to target, as a Python list
 
 # model selection : AvatarNet or default AlexNet
 #MODEL_ID = "avn"
@@ -66,6 +66,7 @@ for l in LAYERS:
         os.system(f"python ./src/discrepancy.py {l} {u} {log} {STRIDE}")
         os.system(f"python ./src/top10.py {l} {u} {log}")
         os.system(f"python ./src/rec_field.py {l} {u} {log}")
+        print(f"Receptive field for unit {u} of layer {l} computed.\n")
 
 ##############################################################################
 # timestamp: exec clock stops

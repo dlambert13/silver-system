@@ -122,7 +122,7 @@ for image_filepath in image_list:
     start_template = (
         "\n---- Processing image {} out of {}\n"
         "Computing discrepancy map for image \'{}\' using unit {} of layer {}\n"
-        "-- Loading model\n"
+        "-- Loading model"
     )
 
     start_message = start_template.format(
@@ -144,7 +144,7 @@ for image_filepath in image_list:
 
     ##########################################################################
     # step 1
-    print("\n-- Passing baseline image to the network")
+    print("-- Passing baseline image to the network")
     # network_forward_pass triggers the forward hook which logs the activation
     # the dummy output of network_forward_pass is not used in this context    
     current_filepath = image_filepath
@@ -157,7 +157,7 @@ for image_filepath in image_list:
     # step 2: passing the occluded images through the network
     ##########################################################################
     occluded_list = os.listdir(occluded_images_dir)
-    occl_template = "\n-- Passing occluded images to the network ({} files)"
+    occl_template = "-- Passing occluded images to the network ({} files)"
     print(occl_template.format(len(occluded_list)))
 
     occluded_list.sort()
@@ -190,14 +190,16 @@ for image_filepath in image_list:
         if  current_index == list_half_index:
             halftime = datetime.datetime.now()
             time = (halftime - start).total_seconds()
-            message = "\tStill working (halfway through ; {:.2f} seconds"
-            message += " since execution started)"
+            message = (
+                "\tStill working (halfway through ; {:.2f} seconds"
+                " since execution started)"
+            )
             print(message.format(time))
 
     ##########################################################################
     # step 3
     ##########################################################################
-    print("\n-- Analyzing discrepancies...")
+    print("-- Analyzing discrepancies...")
 
     x_size, y_size = Image.open(image_filepath).size
     output_image = Image.new("RGB", (x_size, y_size))
@@ -235,6 +237,6 @@ for image_filepath in image_list:
     stop = datetime.datetime.now()    
     timestamp = stop.strftime("%m%d_%H%M%S")
     execution_time = (stop - start).total_seconds()
-    end_template = "\nDiscrepancy map created for image {}.\nTime: {:.2f} seconds\n"
+    end_template = "Discrepancy map created for image {}.\nTime: {:.2f} seconds\n"
     end_message = end_template.format(image_name, execution_time)
     print(end_message)
