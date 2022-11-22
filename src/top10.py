@@ -1,11 +1,16 @@
-""""""
+"""Assembles:
+- the top 10 images;
+- the associated discrepancy maps;
+- the discrepancy maps overlaid on top of the corresponding images.
+"""
 
+##############################################################################
 from helpers import top_10, stack, mask_overlay
 import sys
 import os
 
 ##############################################################################
-# parameters
+# constants and parameters (CLI args or otherwise)
 ##############################################################################
 LAYER = sys.argv[1]
 UNIT = sys.argv[2]
@@ -20,11 +25,11 @@ target_unit_id = f"l{LAYER}u{UNIT}"
 base_filename = "top10_" + target_unit_id
 
 ##############################################################################
-# directory structure creation/verification
+# directory structure creation/verification and save paths
 ##############################################################################
 base_dir = os.path.join(os.getcwd(), "results") # base results directory
-top10_dir = os.path.join(base_dir, "top10") # top 10 storage directory
-save_dir = os.path.join(top10_dir, MODEL_ID) # model-specific directory
+model_dir = os.path.join(base_dir, MODEL_ID) # model-specific directory
+save_dir = os.path.join(model_dir, "top10") # top 10 storage directory
 # save path for the assembled top-10 images
 save_path = os.path.join(save_dir, f"{base_filename}.png")
 # save path for the assembled discrepancy maps
@@ -36,12 +41,15 @@ stack_save_path = os.path.join(save_dir, f"{base_filename}_stack.png")
 
 # directory structure creation if it doesn't exist yet
 # top10 directory, with a subdir for each model
-if "top10" not in os.listdir(base_dir):
-    os.mkdir(top10_dir)
+if "top10" not in os.listdir(model_dir):
     os.mkdir(save_dir)
-else:
-    if MODEL_ID not in os.listdir(top10_dir):
-        os.mkdir(save_dir)
+
+init_message = (
+    "\n------> Assembling top ten images and their discrepancy maps\n"
+    f"Model-specific directory: {model_dir}\n"
+    f"Results for this unit will be saved in: {save_dir}"
+)
+print(init_message)
 
 ##############################################################################
 # assembling the top 10 images
