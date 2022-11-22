@@ -301,12 +301,12 @@ def occlusion(filepath, occluded_dir, stride=3, occluder=11):
             for y_step in range(y_steps)
         ]
 
-        status_template = """processing image: {}
-            image size: {}
-            window size: {} pixels on x axis, {} on y axis
-            stride: {}
-            nb of steps in x direction: {}
-            nb of steps in y direction: {}
+        status_template = """Processing image: {}
+            Image size: {}
+            Window size: {} pixels on x axis, {} on y axis
+            Stride: {}
+            Number of steps in x direction: {}
+            Number of steps in y direction: {}
             """
 
         status_update = status_template.format(
