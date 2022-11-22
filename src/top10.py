@@ -30,13 +30,15 @@ base_filename = "top10_" + target_unit_id
 base_dir = os.path.join(os.getcwd(), "results") # base results directory
 model_dir = os.path.join(base_dir, MODEL_ID) # model-specific directory
 save_dir = os.path.join(model_dir, "top10") # top 10 storage directory
+dc_dir = os.path.join(model_dir, "discrepancy", target_unit_id)
+
 # save path for the assembled top-10 images
 save_path = os.path.join(save_dir, f"{base_filename}.png")
 # save path for the assembled discrepancy maps
 dc_save_path = os.path.join(save_dir, f"{base_filename}_dc.png")
 # save path for the overlaid images
 ol_save_path = os.path.join(save_dir, f"{base_filename}_ol.png")
-# save path for the overlaid images
+# save path for the final image stacking the three images above
 stack_save_path = os.path.join(save_dir, f"{base_filename}_stack.png")
 
 # directory structure creation if it doesn't exist yet
@@ -74,9 +76,7 @@ stack(filepath_list, save_path)
 # the trick here is to stack the files in the same order as they are in
 # filepath_list: looking them up on disk will return them in alphabetical
 # order, which might be different from their order in the top 10
-# -- first, define the path where we look for the discrepancy maps
-dc_dir = os.path.join(base_dir, "discrepancy", MODEL_ID, target_unit_id)
-# -- then, retrieve the stride indicator ("..._dcNN_...")
+# -- first, retrieve the stride indicator ("..._dcNN_...")
 dummy_list = os.listdir(dc_dir)
 _, dummy_filename = os.path.split(dummy_list[0])
 stride_indicator = dummy_filename.split("_")[1]
