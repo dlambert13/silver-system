@@ -1,7 +1,15 @@
+"""Computes the unit's receptive field from the discrepancy maps obtained
+from the top 10 images
+"""
+
+##############################################################################
 import sys
 import os
-import helpers
+from helpers import max_extractor, calibrate, add
 
+##############################################################################
+# constants and parameters (CLI args or otherwise)
+##############################################################################
 LAYER = sys.argv[1]
 UNIT = sys.argv[2]
 LOG = sys.argv[3]
@@ -15,32 +23,37 @@ _, log_filename = os.path.split(LOG)
 MODEL_ID = log_filename.split('_')[0]
 
 ##############################################################################
-# directory structure creation/verification
+# directory structure creation/verification and save path
 ##############################################################################
-base_dir = ".."
-
+base_dir = os.path.join(os.getcwd(), "results") # base results directory
+model_dir = os.path.join(base_dir, MODEL_ID) # model-specific directory
 dc_dir = os.path.join(
-    "..",
-    "discrepancy",
+    base_dir,
     MODEL_ID,
+    "discrepancy",
     target_unit_id
 )
+rf_dir = os.path.join(model_dir, "rf")
+rf_filepath = os.path.join(rf_dir, f"{target_unit_id}_rf.png")
 
-rf_dir = os.path.join("..", "rf")
-model_rf_dir = os.path.join(rf_dir, MODEL_ID)
-unit_rf_dir = os.path.join(model_rf_dir, target_unit_id)
+if MODEL_ID not in os.listdir(base_dir):
+    os.mkdir(model_dir)
 
-if "rf" not in os.listdir(base_dir):
+if "rf" not in os.listdir(model_dir):
     os.mkdir(rf_dir)
 
-if MODEL_ID not in os.listdir(rf_dir):
-    os.mkdir(model_rf_dir)
-
-if target_unit_id not in os.listdir(model_rf_dir):
-    os.mkdir(unit_rf_dir)
+init_message = (
+    "\n------> Computing receptive field from top 10 discrepancy maps\n"
+    f"Model-specific directory: {model_dir}\n"
+    f"Results for this unit will be saved in: {rf_dir}"
+)
+print(init_message)
 
 ##############################################################################
-
+# receptive field computation from the top 10 discrepancy maps
+##############################################################################
+# creating lists where filenames are stored
+# to automate the cleanup process (see the bottom of the script)
 base_list = []
 max_filepaths = []
 cal_filepaths = []
@@ -48,28 +61,30 @@ cal_filepaths = []
 for filename in os.listdir(dc_dir):
     dc_filepath = os.path.join(dc_dir, filename) # points to current dc map
     base_filename = filename.split(".")[0] # removing file extension
-    base_list.append(base_filename) # to automate the rest of the process
+    base_list.append(base_filename) # storing base filename for later lookup
     
-    # -- contour containing max activation in each dc map is saved to an aux file
+    # contour containing max activation in each dc map is saved to an aux file
     max_filepath = os.path.join(
-        unit_rf_dir,
+        rf_dir,
         f"{base_filename}_max.png"
     )
-    max_filepaths.append(max_filepath) # to automate the rest of the process
-    helpers.max_extractor(dc_filepath, max_filepath)
+    max_filepaths.append(max_filepath) # to automate cleanup
+    max_extractor(dc_filepath, max_filepath) # see helpers.max_extractor
     
-    # -- calibrating (centering) each contour and saving to a second aux file
+    # calibrating (centering) each contour and saving to a second aux file
     cal_filepath = os.path.join(
-        unit_rf_dir,
+        rf_dir,
         f"{base_filename}_cal.png"
     )
     cal_filepaths.append(cal_filepath) # to automate the rest of the process
-    helpers.calibrate(max_filepath, cal_filepath)
+    calibrate(max_filepath, cal_filepath) # see helpers.calibrate
+# overlaying the ten calibrated images together; see helpers.add
+add(cal_filepaths, rf_filepath)
 
-rf_filepath = os.path.join(unit_rf_dir, f"{target_unit_id}_rf.png")
-helpers.add(cal_filepaths, rf_filepath)
-
+##############################################################################
 # cleaning up auxiliary files
+##############################################################################
+# comment out to keep the auxiliary files
 #"""
 for i in range(len(base_list)):
     os.remove(max_filepaths[i])

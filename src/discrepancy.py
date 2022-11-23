@@ -1,18 +1,19 @@
-"""computing the top-10 discrepancy maps for a given unit on a given dataset
+"""Computing the top-10 discrepancy maps for a given unit on a given dataset,
+using the occluded images resulting from occlusion.py
 """
 
+##############################################################################
 import os
 import sys
 import torch
-from torchvision import transforms
 from PIL import Image
 import datetime
-import helpers
+from helpers import network_forward_pass, top_10
 
-network_forward_pass = helpers.network_forward_pass
-
-# toggle GPU usage
-# placeholder for future GPU usage implementation
+##############################################################################
+# constants and parameters (CLI args or otherwise)
+##############################################################################
+# toggles GPU usage; placeholder for future GPU usage implementation
 GPU = False
 
 # constants: script parameters
@@ -34,45 +35,44 @@ MODEL_ID = log_filename.split('_')[0]
 # STRIDE and OCCLUDER have a direct impact on the number of files to process;
 # higher values can be used to speed up the process, but the readability of
 # the discrepancy maps will drop accordingly
-# FACTOR is the multiplier for the value of the difference in activation
-# between the baseline image and the occluded image; influences readability
-# of the discrepancy map but no effect on computation time
 STRIDE = int(sys.argv[4])
 OCCLUDER = STRIDE
+# FACTOR is the multiplier for the value of the difference in activation
+# between the baseline image and the occluded image; higher values make
+# discrepancy maps more legible; no effect on computation time
 FACTOR = 15
 
 ##############################################################################
 # directory structure creation/verification
 ##############################################################################
-
-# base project directory
-base_dir = ".."
-# occluded images directory (output of process.py)
+base_dir = os.path.join(os.getcwd(), "results") # base results directory
+# occluded images directory (output of occlusion.py)
 occluded_base_dir = os.path.join(base_dir, "tmp")
-# discrepancy maps directory
-dm_dir = os.path.join(base_dir, "discrepancy")
-# directory where the model-specific discrepancy maps will be saved
-model_dm_dir = os.path.join(dm_dir, MODEL_ID)
-# directory for the unit-specific discrepancy maps will be saved
-unit_dm_dir = os.path.join(model_dm_dir, target_unit_id)
+# directory where the model-specific results will be saved
+model_dir = os.path.join(base_dir, MODEL_ID)
+# discrepancy maps directory within the model-specific directory
+dm_dir = os.path.join(model_dir, "discrepancy")
+# directory where the unit-specific discrepancy maps will be saved
+unit_dm_dir = os.path.join(dm_dir, target_unit_id)
 
-print("Computing discrepancy maps")
-print("Model-specific directory:", model_dm_dir)
-print("Results for this unit will be saved in:", unit_dm_dir)
-
-if "discrepancy" not in os.listdir(base_dir):
+if MODEL_ID not in os.listdir(base_dir):
+    os.mkdir(model_dir)
+if "discrepancy" not in os.listdir(model_dir):
     os.mkdir(dm_dir)
-
-if MODEL_ID not in os.listdir(dm_dir):
-    os.mkdir(model_dm_dir)
-
-if target_unit_id not in os.listdir(model_dm_dir):
+if target_unit_id not in os.listdir(dm_dir):
     os.mkdir(unit_dm_dir)
+
+init_message = (
+    "\n------> Computing discrepancy maps\n"
+    f"Model-specific directory: {model_dir}\n"
+    f"Results for this unit will be saved in: {unit_dm_dir}"
+)
+print(init_message)
 
 ##############################################################################
 # retrieving top-10 file names from log and loading the network
 ##############################################################################
-image_list = helpers.top_10(LAYER, UNIT, LOG)
+image_list = top_10(LAYER, UNIT, LOG)
 nb_images = len(image_list)
 
 if MODEL_ID == "avn":
@@ -93,7 +93,7 @@ else:
         pretrained=True
     )
     # pointing to the resized images
-    resized_dir = os.path.join("..", "tmp", "resized_axn")
+    resized_dir = os.path.join(occluded_base_dir, "resized_axn")
     buffer_image_list = []
     for top10_filepath in image_list:
         _, top10_filename = os.path.split(top10_filepath)
@@ -102,7 +102,9 @@ else:
     image_list = buffer_image_list
 
 ##############################################################################
-# looping over the 10 file names
+# looping over the 10 files:
+# step 1: baseline forward pass, 2: occluded images forward pass,
+# and 3: discrepancy analysis to compute the discrepancy map
 ##############################################################################
 for image_filepath in image_list:
     _, image_filename = os.path.split(image_filepath)
@@ -117,9 +119,11 @@ for image_filepath in image_list:
     start = datetime.datetime.now()
 
     current_index = image_list.index(image_filepath) + 1
-    start_template = """---- Processing image {} out of {}
-Computing discrepancy map for image \'{}\' using unit {} of layer {}
--- Loading model"""
+    start_template = (
+        "\n---- Processing image {} out of {}\n"
+        "Computing discrepancy map for image \'{}\' using unit {} of layer {}\n"
+        "-- Loading model"
+    )
 
     start_message = start_template.format(
         current_index,
@@ -132,10 +136,6 @@ Computing discrepancy map for image \'{}\' using unit {} of layer {}
 
     def activation_map(module, input, output,
         target_unit=UNIT):
-        """
-        note: the reference to output[0] assumes the batch submitted to the
-        model only contains one image at a time 
-        """
         activation_map = output[0][target_unit]
         activation_log.update({current_filepath: activation_map})
 
@@ -144,7 +144,7 @@ Computing discrepancy map for image \'{}\' using unit {} of layer {}
 
     ##########################################################################
     # step 1
-    print("\n-- Passing baseline image to the network")
+    print("-- Passing baseline image to the network")
     # network_forward_pass triggers the forward hook which logs the activation
     # the dummy output of network_forward_pass is not used in this context    
     current_filepath = image_filepath
@@ -157,7 +157,7 @@ Computing discrepancy map for image \'{}\' using unit {} of layer {}
     # step 2: passing the occluded images through the network
     ##########################################################################
     occluded_list = os.listdir(occluded_images_dir)
-    occl_template = "\n-- Passing occluded images to the network ({} files)"
+    occl_template = "-- Passing occluded images to the network ({} files)"
     print(occl_template.format(len(occluded_list)))
 
     occluded_list.sort()
@@ -190,27 +190,35 @@ Computing discrepancy map for image \'{}\' using unit {} of layer {}
         if  current_index == list_half_index:
             halftime = datetime.datetime.now()
             time = (halftime - start).total_seconds()
-            message = "\tStill working (halfway through ; {:.2f} seconds"
-            message += " since execution started)"
+            message = (
+                "\tStill working (halfway through ; {:.2f} seconds"
+                " since execution started)"
+            )
             print(message.format(time))
 
     ##########################################################################
     # step 3
     ##########################################################################
-    print("\n-- Analyzing discrepancies...")
+    print("-- Analyzing discrepancies...")
 
     x_size, y_size = Image.open(image_filepath).size
     output_image = Image.new("RGB", (x_size, y_size))
 
+    # storing the baseline activation in a variable
     baseline = activation_log[image_filepath]
+    # removing baseline filepath from activation log
     activation_log.pop(image_filepath)
 
+    # each log entry is the filepath to an occluded image
+    # occluded filepath format is "..._x-y.png", x and y are the coordinates
+    # we retrieve the coordinates of the occluder from the filepath
     for log_entry in activation_log:
         activation = activation_log[log_entry]
         difference = baseline - activation
+        log_entry = log_entry.split("_")[-1]
         log_entry = log_entry.split("-")
-        x_step = int(log_entry[0].split("_")[-1])
-        y_step = int(log_entry[1].split(".")[0])
+        x_step = int(log_entry[0])
+        y_step = int(log_entry[1].rstrip(".png"))
         value = int(FACTOR * torch.max(difference))
         greyscale_shade = (value, value, value)
         x_pos = x_step * STRIDE
@@ -229,6 +237,6 @@ Computing discrepancy map for image \'{}\' using unit {} of layer {}
     stop = datetime.datetime.now()    
     timestamp = stop.strftime("%m%d_%H%M%S")
     execution_time = (stop - start).total_seconds()
-    end_template = "\nDiscrepancy map created for image {}.\nTime: {:.2f} seconds\n"
+    end_template = "Discrepancy map created for image {}.\nTime: {:.2f} seconds\n"
     end_message = end_template.format(image_name, execution_time)
     print(end_message)
