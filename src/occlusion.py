@@ -27,7 +27,7 @@ _, log_filename = os.path.split(LOG)
 # model id is before the first underscore
 MODEL_ID = log_filename.split('_')[0]
 
-base_dir = os.path.join(os.getcwd(), "results") # base results directory
+base_dir = os.path.join(os.getcwd(), "results")  # base results directory
 temporary_dir = os.path.join(base_dir, "tmp")
 if "tmp" not in os.listdir(base_dir):
     os.mkdir(temporary_dir)
@@ -40,11 +40,11 @@ image_list = top_10(LAYER, UNIT, LOG)
 # -- for axn : the images must first be resized
 if MODEL_ID == "axn":
     resized_dir = os.path.join(temporary_dir, "resized_axn")
-    
+
     # creating dir if it does not yet exist
     if "resized_axn" not in os.listdir(temporary_dir):
         os.mkdir(resized_dir)
-    
+
     # loop over the result of top_10, resizing each image
     buffer_list = []
     for filepath in image_list:
@@ -53,7 +53,7 @@ if MODEL_ID == "axn":
         buffer_list.append(save_filepath)
         # resizing and saving to save_filepath using default size (224, 224)
         resize(filepath, save_filepath)
-    
+
     # overwrite the result of top_10 with the resized images
     image_list = buffer_list
 

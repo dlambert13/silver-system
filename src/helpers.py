@@ -21,7 +21,7 @@ def predict(path, model, preprocess):
 
     output = model(input_batch)
     probabilities = torch.nn.functional.softmax(output[0], dim=0)
-    
+
     label = round(probabilities.detach().numpy()[0], 0)
     confidence = probabilities.detach().numpy()[0]
 
@@ -34,7 +34,7 @@ def tensor_from_file(filename):
     """
     image = Image.open(filename)
 
-    #to handle single-band images (TODO: PIL: ImageMode.getMode ?)
+    # to handle single-band images (TODO: PIL: ImageMode.getMode ?)
     if image.getbands() != ('R', 'G', 'B'):
         image = Image.merge("RGB", [image, image, image])
 
@@ -63,7 +63,7 @@ def tensor_from_avatar_file(filename):
     """
     image = Image.open(filename)
 
-    #to handle single-band images (TODO: PIL: ImageMode.getMode ?)
+    # to handle single-band images (TODO: PIL: ImageMode.getMode ?)
     if image.getbands() != ('R', 'G', 'B'):
         image = Image.merge("RGB", [image, image, image])
 
@@ -79,6 +79,7 @@ def tensor_from_avatar_file(filename):
 
 
 def network_forward_pass(model, filename, mode="hub-model", gpu=True):
+    # TODO: aggressive cleanup
     if mode == "avatar":
         input_tensor = tensor_from_avatar_file(filename)
     else:
@@ -86,21 +87,22 @@ def network_forward_pass(model, filename, mode="hub-model", gpu=True):
 
     # creates a mini-batch as expected by the model
     input_batch = input_tensor.unsqueeze(0)
-    
+
+    """
     # moves the input and model to GPU for speed if available
-    try: 
+    try:
         if gpu and torch.cuda.is_available():
             with torch.no_grad():
                 input_batch = input_batch.to('cuda')
                 #model.to('cuda')
     except RuntimeError: # out of memory
         pass
+    """
 
     # passes the input batch to the model
     with torch.no_grad():
         output = model(input_batch)
-        
-    del input_batch
+    # del input_batch
 
     return output
 
@@ -124,7 +126,7 @@ def stack(image_list, filepath, direction="row"):
 
     max_x = max(x_sizes)
     max_y = max(y_sizes)
-    
+
     sum_x = 0
     sum_y = 0
     for i in range(len(images)):
@@ -158,7 +160,7 @@ def mask_overlay(background, mask, savepath):
     mask_im = Image.open(mask)
     mask_im = mask_im.convert("L")
     factor = 5
-    
+
     x_size = back_im.size[0]
     y_size = back_im.size[1]
 
@@ -176,13 +178,13 @@ def mask_overlay(background, mask, savepath):
                 updated_value = (
                     back_r + factor * mask_value,
                     back_g + factor * mask_value,
-                    back_b + factor * mask_value)    
+                    back_b + factor * mask_value)
                 back_im.putpixel((x, y), updated_value)
 
     back_im.save(savepath, "png")
 
 
-def add(file_list, target_filename):    
+def add(file_list, target_filename):
     array_sum = 0
     for file in file_list:
         image = Image.open(file)
@@ -196,10 +198,10 @@ def add(file_list, target_filename):
     array_min = np.min(array_sum)
     normalized_array = array_sum - array_min
     normalized_array *= 255 / (array_max - array_min)
-    
+
     result_array = normalized_array.astype(dtype="uint8")
     result = Image.fromarray(result_array)
-    
+
     result.save(target_filename, "png")
 
 
@@ -209,13 +211,10 @@ def calibrate(filepath, target_filepath):
     y_size = source.size[1]
     output = Image.new("RGB", (x_size, y_size))
 
-    name = filepath.split("/")[-1]    
-    tail = f"/{name}"
-    path = filepath.rstrip(tail)
-    
     tensor = np.asarray(source)
     # np.nonzero returns three arrays of indices :
     # row (y), column (x), depth (band), in this order
+    """
     try:
         min_y = min(np.nonzero(tensor)[0])
         max_y = max(np.nonzero(tensor)[0])
@@ -225,6 +224,12 @@ def calibrate(filepath, target_filepath):
         output.save(target_filepath, "png")
         print(f"(blank) calibrated file saved in {target_filepath}")
         return
+    """
+
+    min_y = min(np.nonzero(tensor)[0])
+    max_y = max(np.nonzero(tensor)[0])
+    min_x = min(np.nonzero(tensor)[1])
+    max_x = max(np.nonzero(tensor)[1])
 
     largest_dimension = max(max_x - min_x, max_y - min_y)
 
@@ -237,33 +242,29 @@ def calibrate(filepath, target_filepath):
     box = (min_x, min_y, max_x, max_y)
 
     patch = source.resize(size, box=box)
-    
+
     x_corner = int(x_size / 2 - largest_dimension / 2)
     y_corner = int(y_size / 2 - largest_dimension / 2)
     corner = (x_corner, y_corner)
-    
+
     output.paste(patch, box=corner)
 
     output.save(target_filepath, "png")
-    #print(f"calibrated file saved in {target_filepath}")
 
 
 def resize(filepath, save_filepath, new_size=(224, 224)):
     """resize target image and stores it in base folder for discrepancy
     map computation
     """
-
     input_image = Image.open(filepath)
-
     output_image = input_image.resize(new_size)
-
-    filename = filepath.split("/")[-1]
     output_image.save(save_filepath, "jpeg")
 
 
 def occlusion(filepath, occluded_dir, stride=3, occluder=11):
     """occluded_dir: to specify the directory where the occluded images must
     be saved
+    TODO: return None, or other option ?
     """
     name = filepath.split("/")[-1].rstrip(".jpg").rstrip(".png")
     occluded_list = os.listdir(occluded_dir)
@@ -276,11 +277,11 @@ def occlusion(filepath, occluded_dir, stride=3, occluder=11):
         start = datetime.datetime.now()
 
         output_dir = os.path.join(occluded_dir, name)
-        os.mkdir(output_dir)    
+        os.mkdir(output_dir)
 
         OCCLUDER_SIZE = occluder
         STRIDE = stride
-        
+
         rng = np.random.default_rng()
 
         input_image = Image.open(filepath)
@@ -290,8 +291,9 @@ def occlusion(filepath, occluded_dir, stride=3, occluder=11):
         x_window = OCCLUDER_SIZE
         y_window = OCCLUDER_SIZE
 
-        #steps: coordinates of the pixel where each occluding window originates
-        #occluder will cover x_window pixels from x_step to x_step + x_window - 1
+        # steps: coordinates of the pixel where each occluding window
+        # originates; occluder will cover x_window pixels from x_step to
+        # x_step + x_window - 1
         x_steps = 1 + int((size[0] - x_window) / STRIDE)
         y_steps = 1 + int((size[1] - y_window) / STRIDE)
 
@@ -319,8 +321,8 @@ def occlusion(filepath, occluded_dir, stride=3, occluder=11):
 
         print(status_update)
 
-        #each pixel of each occluding window is given a noisy rgb value
-        #computed using rng.normal (loc = mu (mean), scale = sigma (stdev))
+        # each pixel of each occluding window is given a noisy rgb value
+        # computed using rng.normal (loc = mu (mean), scale = sigma (stdev))
         for step in steps:
             x_step = step[0] * STRIDE
             y_step = step[1] * STRIDE
@@ -336,16 +338,19 @@ def occlusion(filepath, occluded_dir, stride=3, occluder=11):
 
                     putpixel((x, y), (r_noise, g_noise, b_noise))
 
-            output_filepath = f"{output_dir}/{name}_{step[0]:03d}-{step[1]:03d}.png"
+            output_filepath_str = "{}/{}_{:03d}-{:03d}.png"
+            output_filepath = output_filepath_str.format(
+                output_dir, name, step[0], step[1]
+            )
             output_image.save(output_filepath, "png")
 
         input_image.close()
         print("occluded images successfully created")
 
         # timestamp: exec clock stops
-        stop = datetime.datetime.now()    
+        stop = datetime.datetime.now()
         execution_time = (stop - start).total_seconds()
-        end_message =  f"Time: {execution_time:.2f} seconds\n"
+        end_message = f"Time: {execution_time:.2f} seconds\n"
         print(end_message)
 
 
@@ -353,7 +358,7 @@ def top_10(layer, unit, log):
     """warning: heavily relies on the structure of the log file"""
     log_file = open(log, 'r')
     file_as_list = [line for line in log_file]
-    
+
     # target unit log retrieval: using the "L, U:" line as a checkpoint
     checkpoint = file_as_list.index(f"{layer}, {unit}:\n")
     target_line = file_as_list[checkpoint + 1]
@@ -371,9 +376,10 @@ def top_10(layer, unit, log):
 
 
 def max_extractor(filepath, target_filepath):
+    """TODO: review/rewrite"""
     image = Image.open(filepath)
     output_image = Image.new("L", image.size)
-    
+
     array = np.asarray(image.convert(mode="L"))
     center = np.unravel_index(np.argmax(array, axis=None), array.shape)
     center = (float(center[0]), float(center[1]))
@@ -391,21 +397,30 @@ def max_extractor(filepath, target_filepath):
     tests = np.asarray(
         [cv.pointPolygonTest(contour, center, True) for contour in contours]
     )
+
+    max_act_contour = np.argmax(tests)
+    """
     try:
         max_act_contour = np.argmax(tests)
     except:
         "Error during contour extraction; saving blank image"
         output_image.save(target_filepath, "png")
         return
+    """
 
     # array of distances to main contour
-    main_contour = [[cv.pointPolygonTest(contours[max_act_contour], (x, y), True) for x in range(image.size[0])] for y in range(image.size[1])]
-    
+    main_contour = [[
+            cv.pointPolygonTest(
+                contours[max_act_contour], (x, y), True
+            ) for x in range(image.size[0])
+        ] for y in range(image.size[1])]
+
     for x in range(image.size[0]):
         for y in range(image.size[1]):
             # if the current pixel is within the main contour, value, else 0
             if main_contour[y][x] > 0:
-                value = image.getpixel((x, y))[0] #assumes tuple with three identical coordinates
+                # warning: assumes tuple with three identical coordinates
+                value = image.getpixel((x, y))[0]
                 output_image.putpixel((x, y), value)
 
     output_image.save(target_filepath, "png")

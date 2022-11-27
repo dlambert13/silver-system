@@ -45,7 +45,7 @@ FACTOR = 15
 ##############################################################################
 # directory structure creation/verification
 ##############################################################################
-base_dir = os.path.join(os.getcwd(), "results") # base results directory
+base_dir = os.path.join(os.getcwd(), "results")  # base results directory
 # occluded images directory (output of occlusion.py)
 occluded_base_dir = os.path.join(base_dir, "tmp")
 # directory where the model-specific results will be saved
@@ -112,7 +112,7 @@ for image_filepath in image_list:
     image_name = image_filename.split(".")[0]
     # locating the occluded images corresponding to the file from the top 10
     occluded_images_dir = os.path.join(occluded_base_dir, image_name)
-    
+
     activation_log = {}
 
     # timestamp: exec clock starts
@@ -121,7 +121,8 @@ for image_filepath in image_list:
     current_index = image_list.index(image_filepath) + 1
     start_template = (
         "\n---- Processing image {} out of {}\n"
-        "Computing discrepancy map for image \'{}\' using unit {} of layer {}\n"
+        "Computing discrepancy map for image \'{}\'"
+        "using unit {} of layer {}\n"
         "-- Loading model"
     )
 
@@ -134,8 +135,7 @@ for image_filepath in image_list:
     )
     print(start_message)
 
-    def activation_map(module, input, output,
-        target_unit=UNIT):
+    def activation_map(module, input, output, target_unit=UNIT):
         activation_map = output[0][target_unit]
         activation_log.update({current_filepath: activation_map})
 
@@ -146,13 +146,13 @@ for image_filepath in image_list:
     # step 1
     print("-- Passing baseline image to the network")
     # network_forward_pass triggers the forward hook which logs the activation
-    # the dummy output of network_forward_pass is not used in this context    
+    # the dummy output of network_forward_pass is not used in this context
     current_filepath = image_filepath
     if MODEL_ID == "avn":
         network_forward_pass(model, current_filepath, mode="avatar", gpu=GPU)
     else:
         network_forward_pass(model, current_filepath, gpu=GPU)
-        
+
     ##########################################################################
     # step 2: passing the occluded images through the network
     ##########################################################################
@@ -167,7 +167,7 @@ for image_filepath in image_list:
             occluded_images_dir,
             occluded_im_filename
         )
-        
+
         current_filepath = occluded_im_filepath
         # network_forward_pass triggers the forward hook, logs the activation
         # the dummy output of network_forward_pass is not used in this context
@@ -183,11 +183,11 @@ for image_filepath in image_list:
                 current_filepath,
                 gpu=GPU
             )
-    
+
         current_index = occluded_list.index(occluded_im_filename)
         list_half_index = int(len(occluded_list) / 2)
 
-        if  current_index == list_half_index:
+        if current_index == list_half_index:
             halftime = datetime.datetime.now()
             time = (halftime - start).total_seconds()
             message = (
@@ -226,7 +226,7 @@ for image_filepath in image_list:
         for x in range(x_pos, x_pos + OCCLUDER):
             for y in range(y_pos, y_pos + OCCLUDER):
                 output_image.putpixel((x, y), greyscale_shade)
-    
+
     out_filename = os.path.join(
         unit_dm_dir,
         f"{image_name}_dc{STRIDE}_{target_unit_id}.png"
@@ -234,9 +234,12 @@ for image_filepath in image_list:
     output_image.save(out_filename, "png")
 
     # timestamp: exec clock stops
-    stop = datetime.datetime.now()    
+    stop = datetime.datetime.now()
     timestamp = stop.strftime("%m%d_%H%M%S")
     execution_time = (stop - start).total_seconds()
-    end_template = "Discrepancy map created for image {}.\nTime: {:.2f} seconds\n"
+    end_template = (
+        "Discrepancy map created for image {}.\n"
+        "Time: {:.2f} seconds\n"
+    )
     end_message = end_template.format(image_name, execution_time)
     print(end_message)

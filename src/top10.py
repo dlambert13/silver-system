@@ -27,9 +27,9 @@ base_filename = "top10_" + target_unit_id
 ##############################################################################
 # directory structure creation/verification and save paths
 ##############################################################################
-base_dir = os.path.join(os.getcwd(), "results") # base results directory
-model_dir = os.path.join(base_dir, MODEL_ID) # model-specific directory
-save_dir = os.path.join(model_dir, "top10") # top 10 storage directory
+base_dir = os.path.join(os.getcwd(), "results")  # base results directory
+model_dir = os.path.join(base_dir, MODEL_ID)  # model-specific directory
+save_dir = os.path.join(model_dir, "top10")  # top 10 storage directory
 dc_dir = os.path.join(model_dir, "discrepancy", target_unit_id)
 
 # save path for the assembled top-10 images
@@ -60,13 +60,13 @@ filepath_list = top_10(LAYER, UNIT, LOG)
 
 if MODEL_ID == "axn":
     # pointing to the resized images
-        resized_dir = os.path.join(base_dir, "tmp", "resized_axn")
-        buffer_filepath_list = []
-        for top10_filepath in filepath_list:
-            _, top10_filename = os.path.split(top10_filepath)
-            resized_filepath = os.path.join(resized_dir, top10_filename)
-            buffer_filepath_list.append(resized_filepath)
-        filepath_list = buffer_filepath_list
+    resized_dir = os.path.join(base_dir, "tmp", "resized_axn")
+    buffer_filepath_list = []
+    for top10_filepath in filepath_list:
+        _, top10_filename = os.path.split(top10_filepath)
+        resized_filepath = os.path.join(resized_dir, top10_filename)
+        buffer_filepath_list.append(resized_filepath)
+    filepath_list = buffer_filepath_list
 
 stack(filepath_list, save_path)
 
@@ -117,8 +117,8 @@ stack(
 # cleaning up auxiliary files
 ##############################################################################
 # comment out to keep the auxiliary files
-#"""
+# """
 os.remove(save_path)
 os.remove(dc_save_path)
 os.remove(ol_save_path)
-#"""
+# """
