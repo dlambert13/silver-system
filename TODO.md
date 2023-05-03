@@ -1,6 +1,6 @@
 # silver system, version 2022.1120 - TODO (draft)
 
-The present document serves as a _post-mortem_ and expands on ideas from the accompanying project report and slides, and augments them with:
+The present document serves as a _post-mortem_ and expands on ideas from the accompanying project report and slides (see ``pdf`` folder), and augments them with:
 - details provided by the Avatar team but not included in the report;
 - conclusions drawn from the project's unfolding, implementation and results after the report deadline;
 - the authors' research into software engineering good practices, deep learning and computer vision concepts over the summer of 2022, along with the first weeks of the authors' deep learning and explainability (XAI) classes taking place during the Fall semester of 2022/2023.
