@@ -17,7 +17,7 @@ Each network uses a specific dataset, with specific image sizes, on which a spec
 
 
 ## Contents
-Following the "tracer bullet" principle outlined in [The Pragmatic Programmer](https://pragprog.com/titles/tpp20/the-pragmatic-programmer-20th-anniversary-edition/) (Thomas & Hunt, 1999), this code repository contains a proof-of-concept implementation of the methods outlined in _Zhou et al, 2015_.
+Following the "tracer bullet" principle outlined in [The Pragmatic Programmer](https://pragprog.com/titles/tpp20/the-pragmatic-programmer-20th-anniversary-edition/) (Thomas & Hunt, 1999), this code repository contains a proof-of-concept implementation of the methods outlined in Zhou et al, 2015.
 
 The code included is the authors' honest attempt at implementing these methods from scratch, without referring to previously implemented versions of Zhou's or similar methods, and without any prior knowledge of the PyTorch platform.
 
