@@ -31,10 +31,10 @@ The authors would like to stress the fact that the research project, the code re
 
 
 ## Pipeline
-``activation_logging.py`` logs the top 10 images for all units of all ReLU layers of the chosen network.
+``activation_logging.py`` logs the top 10 images for all units of all ReLU layers of the chosen network in ``txt`` files.
 
-``main_script.py`` wraps the rest of the pipeline: it is where the parameters (which model to use, which units of which layers to target, which stride to use in the occlusion process) for the receptive field computation are defined, and then passed to the scripts listed below:
-- ``occlusion.py`` creates the occluded images from the top-10 images, with which the discrepancy map will be computed;
+``main_script.py`` wraps the rest of the pipeline: the parameters (which model to use, which units of which layers to target, which stride to use in the occlusion process) for the receptive field computation are defined, and then passed to the scripts listed below:
+- ``occlusion.py`` parses the relevant log file and creates the occluded images from the top 10 images, with which the discrepancy map will be computed;
 - ``discrepancy.py`` computes the discrepancy maps;
 - ``top10.py`` assembles the top-10 images into one to make the results more readable;
 - ``rec_field.py`` computes the receptive field from the discrepancy maps.
