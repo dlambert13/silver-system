@@ -9,6 +9,8 @@ Authors: Kh&#x00E1;nh Nam NGUY&#x1EC4;N and David Lambert
 
 - application to AlexNet and a variant trained by the Silver Sight team on images from a behavioral neuroscience experiment on human orientation in an artificial environment (the Avatar experiment by Becu et al. using the Institute of Vision's Streetlab platform)
 
+The project report and the slides used during the project defense are included in the ``pdf`` folder.
+
 
 ## Notes
 Throughout the code and accompanying documents, mentions of "AlexNet", "AxN", "alexnet", or "axn" refer to the pre-trained, "vanilla" version of AlexNet made available by PyTorch via their Hub platform and downloaded from said platform; "AvatarNet", "AvN", "avatarnet" and "avn" refer to the the network trained by the Avatar team before the authors were onboarded on the present research project.
