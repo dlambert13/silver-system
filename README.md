@@ -93,4 +93,4 @@ Contents of the validation subset included in "DataAfterWellSamplingCleanedTrain
 Structure: two subfolders "geo" and "lmk"
 
 ## License
-GNU GPLv3
+This implementation is licensed under a GNU GPLv3 license.
