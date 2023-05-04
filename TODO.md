@@ -1,6 +1,6 @@
 # silver system, version 2022.1120 - TODO
 
-The present document serves as a _post-mortem_ for the first step of the project (February to May 2022).
+The present document serves as a _post-mortem_ for the first step of the project, ranging from February to May 2022, some light refactoring during October and November 2022.
 
 It expands on ideas from the accompanying project report and slides (see ``pdf`` folder), and augments them with:
 - details provided by the Avatar team but not included in the report;
