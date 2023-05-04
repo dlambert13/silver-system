@@ -94,5 +94,9 @@ Contents of the validation subset included in "DataAfterWellSamplingCleanedTrain
 1k images: 500 for each class
 Structure: two subfolders "geo" and "lmk"
 
+## To do
+
+For a detailed to-do list, please refer to the attached ``TODO.md`` file.
+
 ## License
 This implementation is licensed under a GNU GPLv3 license.
