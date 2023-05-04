@@ -1,17 +1,19 @@
-# silver system, version 2022.1120 - TODO (draft)
+# silver system, version 2022.1120 - TODO
 
-The present document serves as a _post-mortem_ and expands on ideas from the accompanying project report and slides (see ``pdf`` folder), and augments them with:
+The present document serves as a _post-mortem_ for the first step of the project (February to May 2022).
+
+It expands on ideas from the accompanying project report and slides (see ``pdf`` folder), and augments them with:
 - details provided by the Avatar team but not included in the report;
 - conclusions drawn from the project's unfolding, implementation and results after the report deadline;
-- the authors' research into software engineering good practices, deep learning and computer vision concepts over the summer of 2022, along with the first weeks of the authors' deep learning and explainability (XAI) classes taking place during the Fall semester of 2022/2023.
+- the authors' research into software engineering good practices, deep learning and computer vision concepts over the summer of 2022, along with the first weeks of the authors' deep learning and explainability (XAI) classes taking place during the Fall semester of university year 2022/2023.
 
 The purpose of this document is not to bring definitive answers but to try and define avenues of reflection in the eventuality of a continuation of the research project, whether by its authors, their supervisor or any present or future participant.
 
 The term _post-mortem_ merely reflects the fact that this document was drafted after the research project's defense, which took place at the end of May 2022.
 
-**Please note** that this document, in its present draft state, is incomplete and has not yet been reviewed by, and does not in any way reflect the views of or otherwise bind the authors' supervisor for this research project, Associate Professor Denis Sheynikhovich, to whom the authors would like to reiterate their sincere gratitude for his attention and support over the course of their collaboration.
+**Please note** that this document, in its present state, is by definition incomplete and has not yet been reviewed by, and does not in any way reflect the views of or otherwise bind the authors' supervisor for this research project, Associate Professor Denis Sheynikhovich, to whom the authors would like to reiterate their sincere gratitude for his attention and support over the course of their collaboration.
 
-## Implementation details
+## Implementation details and codebase refactoring
 
 The following items would represent a first but essential step in extending the project: making sure its codebase is sound and reusable.
 
@@ -32,13 +34,18 @@ PyT classes and functions to add a layer of abstraction (see OO architecture abo
 Taking advantage of PyTorch's functionalities to make the implementation device-agnostic, i.e. relying on GPU if available, but able to default to CPU execution otherwise, without any user input. If GPU is available, and used by the implementation, we could expect an increase in execution speed.
 
 ## Larger context
-Questions that the chosen explainability method, AvatarNet's and the Avatar dataset's underlying behaviour modeling approach, and time constraints have not allowed us to address over the course of the research project itself:
+
+This section outlines some of the questions that the chosen explainability method, AvatarNet's and the Avatar dataset's underlying behaviour modeling approach, and time constraints have not allowed us to address over the course of the research project itself:
 
 ### Choice of network
-AlexNet was the state of the art at publication time in 2012, and blew its second-place competitor out of the water; however, it has since been outperformed by, among other things, Transformers-based architectures. Would such networks be relevant for the purpose of this research project ? Specifically, how about the biological plausibility of vision Transformers as models for the human visual cortex ?
 
-### Dataset curation and impact on learned representations
-Given the redundancies in the dataset, the possible redundancies in the representations learned by the network would be relevant to investigate
+AlexNet was the state of the art at publication time in 2012, and blew its second-place competitor out of the water; however, it has since been outperformed by, among other things, Transformers-based architectures. Would such networks be relevant for the purpose of this research project ? Specifically, what does the state of the art have to say about the biological plausibility of vision Transformers as models for the human visual cortex ?
+
+### Dataset: choice, curation and impact on learned representations
+
+Running the scripts using AlexNet on ImageNet, and not on the COCO validation set, might yield different results, given the specific relationship between the model and its original training set ; unfortunately, the authors were not able to access the original ImageNet dataset during the course of their project, but support from an institution-backed actor might get them the access they require, and allow them to compare the results obtained for example by running the top-k script on ImageNet and on the COCO validation set, and thus gain further insight into the relevance of the top-k method itself, and the variability of results it yields given this implicit parameter.
+
+Moreover, and where the Avatar dataset is concerned, given the redundancies in the dataset, the possible redundancies in the representations learned by the network would be relevant to investigate further, perhaps using a more advanced method.
 
 ### Explainability method
 The chosen XAI method works well for geometric patterns but not so much for textures and colors or more generally diffuse stimuli: it allows for localization of the stimulus to which a given unit is succeptible, but not for precise identification or representation. As a consequence, it seems necessary to implement other methods, such as deconvnets, GradCAMs or other methods possibly identified by further investigation into the state of the art.
