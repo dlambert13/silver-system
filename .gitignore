@@ -1,4 +1,5 @@
 # Directory structure
+avn/
 datasets/
 results/
 
@@ -7,3 +8,8 @@ env_silver-system/
 
 # Byte-compiled files
 src/__pycache__/
+
+# misc files
+/src/alt_debug.py
+/src/debug.py
+/src/'silver-system - activation sorting.ipynb'
