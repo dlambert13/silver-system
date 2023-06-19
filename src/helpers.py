@@ -11,6 +11,7 @@ import os
 
 
 def predict(path, model, preprocess):
+    """TODO: with torch.no_grad():"""
     input_image = Image.open(path)
     if input_image.size[0] != 3:
         input_image = input_image.convert('RGB')
@@ -22,8 +23,11 @@ def predict(path, model, preprocess):
     output = model(input_batch)
     probabilities = torch.nn.functional.softmax(output[0], dim=0)
 
-    label = round(probabilities.detach().numpy()[0], 0)
-    confidence = probabilities.detach().numpy()[0]
+#    label = round(probabilities.detach().numpy()[0], 0)
+#    confidence = probabilities.detach().numpy()[0]
+
+    confidence = torch.max(probabilities, dim=0)[0].item()
+    label = torch.max(probabilities, dim=0)[1].item()
 
     return label, confidence
 
@@ -64,11 +68,11 @@ def tensor_from_avatar_file(filename):
     image = Image.open(filename)
 
     # to handle single-band images (TODO: PIL: ImageMode.getMode ?)
-    if image.getbands() != ('R', 'G', 'B'):
-        image = Image.merge("RGB", [image, image, image])
+#    if image.getbands() != ('R', 'G', 'B'):
+#        image = Image.merge("RGB", [image, image, image])
 
     preprocess = transforms.Compose([
-        transforms.ToTensor(),
+        transforms.ToTensor()
     ])
 
     tensor = preprocess(image)

@@ -1,4 +1,5 @@
 """ Passes the entire selected dataset through the selected model (network)
+to log the 10 images that most activate each unit of each layer
 Passing "avn" as a second argument selects AvatarNet; the script otherwise
 defaults to AlexNet ("axn")
 """
