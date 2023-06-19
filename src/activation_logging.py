@@ -1,4 +1,5 @@
 """ Passes the entire selected dataset through the selected model (network)
+to log the 10 images that most activate each unit of each layer
 Passing "avn" as a second argument selects AvatarNet; the script otherwise
 defaults to AlexNet ("axn")
 """
@@ -6,7 +7,6 @@ defaults to AlexNet ("axn")
 ##############################################################################
 # imports
 ##############################################################################
-print("\n--- Importing dependencies...")
 import sys
 import os
 import datetime
@@ -19,7 +19,7 @@ from helpers import network_forward_pass
 # DATASET (sys.argv[1]) indicates the dataset folder, as a subfolder of
 # the ".\datasets" folder
 # ACTIVATION_MEASUREMENT, optional, can specify the function we use
-# to measure the activation of the unit; defaults to max if not specified 
+# to measure the activation of the unit; defaults to max if not specified
 print("\n--- Parsing arguments...")
 DATASET = sys.argv[1]
 PATH = f"..{os.sep}datasets{os.sep}{DATASET}"
@@ -56,11 +56,12 @@ with os.scandir(PATH) as directory_iterator:
 
 dataset_len = len(file_list)
 
-# logging ReLU layers only; the number of units in ReLU layers is hardcoded below
+# logging ReLU layers only
+# the number of units in ReLU layers is hardcoded below
 # log tensor row represents a unit, columns a file
 
 # full log run
-#"""
+# """
 LAYERS = [1, 4, 7, 9, 11]
 UNITS = [64, 192, 384, 256, 256]
 activation_log_1 = torch.as_tensor([[0] * dataset_len] * UNITS[0])
@@ -76,7 +77,7 @@ activation_logs = [
     activation_log_9,
     activation_log_11
 ]
-#"""
+# """
 
 # limited test run
 """
@@ -93,18 +94,18 @@ activation_log_names = [
 ##############################################################################
 # defining forward hook
 ##############################################################################
-def activation(module, input, output,
-    measure=ACTIVATION_MEASUREMENT,
-    ):
+
+
+def activation(module, input, output, measure=ACTIVATION_MEASUREMENT):
     """logs the activation of the units of a specific layer to the specified
     logging dictionary
     - keys: filenames
     - values: activation values, defined using a measurement function passed
     as a keyword argument
     note: the reference to output[0] assumes the batch submitted to the model
-    only contains one image at a time 
-    note: the reference to file_index is abusive and error-prone, and should be avoided in
-    production code
+    only contains one image at a time
+    note: the reference to file_index is abusive and error-prone, and should
+    be avoided in production code
     """
     units = range(output[0].size(0))
     log_name = next(iter(module.state_dict()))
@@ -113,8 +114,10 @@ def activation(module, input, output,
         activation = measure(output[0][unit])
         log[unit, file_index] = activation
 
-##############################################################################
 
+##############################################################################
+# body of the algorithm
+##############################################################################
 # timestamp: exec clock starts
 start = datetime.datetime.now()
 
@@ -160,10 +163,10 @@ for file_index in range(dataset_len):
         network_forward_pass(model, filename, mode="avatar", gpu=GPU)
     else:
         network_forward_pass(model, filename, gpu=GPU)
-    
+
     # progress indicator (for long file lists)
     if file_index in checkpoints:
-        checkpoint = datetime.datetime.now()    
+        checkpoint = datetime.datetime.now()
         ckpt_timestamp = checkpoint.strftime("%H:%M:%S")
         status = f"\tStill working (file {file_index} out of {dataset_len}"
         status += f", time: {ckpt_timestamp})"
@@ -177,7 +180,7 @@ for layer in range(len(LAYERS)):
     layer_id = LAYERS[layer]
     for unit in range(UNITS[layer]):
         log = {}
-        
+
         for file_id in range(dataset_len):
             log.update({file_id: activation_logs[layer][unit][file_id]})
 
@@ -187,12 +190,10 @@ for layer in range(len(LAYERS)):
         activation_values.sort(reverse=True)
 
         top10 = []
-
         for rank in range(10):
             activ_value = activation_values[rank]
             activ_file_index = inverse_log[activ_value]
             top10 += [file_list[activ_file_index]]
-            
         top10_log.update({(layer_id, unit): top10})
 
 # step 5
@@ -228,7 +229,7 @@ log_file.write(file_content)
 log_file.close()
 
 # timestamp: exec clock stops
-stop = datetime.datetime.now()    
+stop = datetime.datetime.now()
 timestamp = stop.strftime("%m%d_%H%M%S")
 
 execution_time = (stop - start).total_seconds()

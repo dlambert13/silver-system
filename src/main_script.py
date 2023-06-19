@@ -6,7 +6,6 @@ Uses a pre-computed log file, stored in ../logs/
 ##############################################################################
 import datetime
 import os
-from helpers import top_10
 
 ##############################################################################
 # constants and parameters (CLI args or otherwise)
@@ -14,11 +13,11 @@ from helpers import top_10
 # as a reference regarding the AlexNet architecture, the indices of the
 # model's ReLU layers, and the associated number of units:
 # l_u_dict = {1: 64, 4: 192, 7: 384, 9: 256, 11: 256}
-LAYERS = [7] # layers to target, as a Python list
-UNITS = [1] # units to target, as a Python list
+LAYERS = [7]  # layers to target, as a Python list
+UNITS = [1]  # units to target, as a Python list
 
 # model selection : AvatarNet or default AlexNet
-#MODEL_ID = "avn"
+# MODEL_ID = "avn"
 MODEL_ID = "axn"
 
 # recommended values for the stride of the occlusion process to keep the
@@ -30,7 +29,7 @@ else:
     STRIDE = 5
 
 # to override the recommended values, uncomment the next line:
-#STRIDE = 4
+# STRIDE = 4
 
 ##############################################################################
 # timestamp: exec clock starts
@@ -59,19 +58,19 @@ if "results" not in os.listdir(project_dir):
 ##############################################################################
 print(f"Receptive field computation for network {MODEL_ID}")
 print(f"Using log file found in {log}")
-for l in LAYERS:
-    for u in UNITS:
-        print(f"Computing receptive field for unit {u} of layer {l}")
-        os.system(f"python ./src/occlusion.py {l} {u} {log} {STRIDE}")
-        os.system(f"python ./src/discrepancy.py {l} {u} {log} {STRIDE}")
-        os.system(f"python ./src/top10.py {l} {u} {log}")
-        os.system(f"python ./src/rec_field.py {l} {u} {log}")
-        print(f"Receptive field for unit {u} of layer {l} computed.\n")
+for layer in LAYERS:
+    for unit in UNITS:
+        print(f"Computing receptive field for unit {unit} of layer {layer}")
+        os.system(f"python ./src/occlusion.py {layer} {unit} {log} {STRIDE}")
+        os.system(f"python ./src/discrepancy.py {layer} {unit} {log} {STRIDE}")
+        os.system(f"python ./src/top10.py {layer} {unit} {log}")
+        os.system(f"python ./src/rec_field.py {layer} {unit} {log}")
+        print(f"Receptive field for unit {unit} of layer {layer} computed.\n")
 
 ##############################################################################
 # timestamp: exec clock stops
 ##############################################################################
-stop = datetime.datetime.now()    
+stop = datetime.datetime.now()
 execution_time = (stop - start).total_seconds()
 end_message = f"Time: {execution_time:.2f} seconds\n"
 print(end_message)

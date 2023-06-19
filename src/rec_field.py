@@ -25,8 +25,8 @@ MODEL_ID = log_filename.split('_')[0]
 ##############################################################################
 # directory structure creation/verification and save path
 ##############################################################################
-base_dir = os.path.join(os.getcwd(), "results") # base results directory
-model_dir = os.path.join(base_dir, MODEL_ID) # model-specific directory
+base_dir = os.path.join(os.getcwd(), "results")  # base results directory
+model_dir = os.path.join(base_dir, MODEL_ID)  # model-specific directory
 dc_dir = os.path.join(
     base_dir,
     MODEL_ID,
@@ -59,25 +59,25 @@ max_filepaths = []
 cal_filepaths = []
 
 for filename in os.listdir(dc_dir):
-    dc_filepath = os.path.join(dc_dir, filename) # points to current dc map
-    base_filename = filename.split(".")[0] # removing file extension
-    base_list.append(base_filename) # storing base filename for later lookup
-    
+    dc_filepath = os.path.join(dc_dir, filename)  # points to current dc map
+    base_filename = filename.split(".")[0]  # removing file extension
+    base_list.append(base_filename)  # storing base filename for later lookup
+
     # contour containing max activation in each dc map is saved to an aux file
     max_filepath = os.path.join(
         rf_dir,
         f"{base_filename}_max.png"
     )
-    max_filepaths.append(max_filepath) # to automate cleanup
-    max_extractor(dc_filepath, max_filepath) # see helpers.max_extractor
-    
+    max_filepaths.append(max_filepath)  # to automate cleanup
+    max_extractor(dc_filepath, max_filepath)  # see helpers.max_extractor
+
     # calibrating (centering) each contour and saving to a second aux file
     cal_filepath = os.path.join(
         rf_dir,
         f"{base_filename}_cal.png"
     )
-    cal_filepaths.append(cal_filepath) # to automate the rest of the process
-    calibrate(max_filepath, cal_filepath) # see helpers.calibrate
+    cal_filepaths.append(cal_filepath)  # to automate the rest of the process
+    calibrate(max_filepath, cal_filepath)  # see helpers.calibrate
 # overlaying the ten calibrated images together; see helpers.add
 add(cal_filepaths, rf_filepath)
 
@@ -85,8 +85,8 @@ add(cal_filepaths, rf_filepath)
 # cleaning up auxiliary files
 ##############################################################################
 # comment out to keep the auxiliary files
-#"""
+# """
 for i in range(len(base_list)):
     os.remove(max_filepaths[i])
     os.remove(cal_filepaths[i])
-#"""
+# """
